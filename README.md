@@ -93,6 +93,8 @@ The reproducible Arm64 migration and dual-architecture evidence contract is in
 [`docs/ARM_OPTIMIZATION.md`](docs/ARM_OPTIMIZATION.md).
 Native-package compatibility evidence is in
 [`docs/ARM_EVIDENCE.md`](docs/ARM_EVIDENCE.md).
+The credential-safe, cost-bounded CloudShell deployment procedure is in
+[`docs/AWS_DEPLOYMENT_RUNBOOK.md`](docs/AWS_DEPLOYMENT_RUNBOOK.md).
 Judge-ready drafts and timed demo scripts are in
 [`docs/COCKROACHDB_SUBMISSION.md`](docs/COCKROACHDB_SUBMISSION.md),
 [`docs/COCKROACHDB_VIDEO_SCRIPT.md`](docs/COCKROACHDB_VIDEO_SCRIPT.md),

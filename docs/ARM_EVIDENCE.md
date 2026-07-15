@@ -32,6 +32,26 @@ cross-architecture proof completed from commit `5bb6d14`:
   {"application": "LabRecall AI", "architecture": "x86_64", "psycopg_version": "3.3.4", "static_assets": ["app.css", "app.js", "index.html"]}
   ```
 
+## Native Linux Arm64 CI proof and deployment artifacts
+
+Commit `4f9f979` added a second job on GitHub's hosted `ubuntu-24.04-arm` runner.
+Both jobs build the Lambda target on the target CPU, import the native `psycopg-binary`
+wheel, run the same package probe, and upload a short-lived deployment artifact.
+
+- Workflow run: <https://github.com/spectramaster/labrecall-ai/actions/runs/29453148414>
+- `package-arm64`: `success` in 17 seconds
+- Native Arm64 probe:
+
+  ```json
+  {"application": "LabRecall AI", "architecture": "aarch64", "psycopg_version": "3.3.4", "static_assets": ["app.css", "app.js", "index.html"]}
+  ```
+
+- `verify` (x86_64): `success`
+- Uploaded artifacts: `labrecall-linux-arm64` (28,484,956 bytes) and
+  `labrecall-linux-x86_64` (27,060,828 bytes)
+- Artifact expiry: 2026-07-22 UTC. The workflow can regenerate both from the same commit;
+  the archives are deployment inputs, not permanent evidence.
+
 ## Remaining evidence
 
 - Build in AWS Lambda's architecture-matched SAM container.

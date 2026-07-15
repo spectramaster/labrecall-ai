@@ -64,12 +64,26 @@ Resources:
               Action: secretsmanager:GetSecretValue # pragma: allowlist secret
               Resource: !Ref DatabaseSecretArn
       Events:
+        Root:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref LabRecallHttpApi
+            Path: /
+            Method: ANY
         Api:
           Type: HttpApi
           Properties:
             ApiId: !Ref LabRecallHttpApi
             Path: /{proxy+}
             Method: ANY
+
+  LabRecallLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${LabRecallApi}
+      RetentionInDays: 7
 
 Outputs:
   ApiUrl:
@@ -78,3 +92,5 @@ Outputs:
     Value: !Ref Architecture
   MemoryNamespace:
     Value: !Ref MemoryNamespace
+  FunctionName:
+    Value: !Ref LabRecallApi
