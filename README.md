@@ -91,6 +91,8 @@ The deployable system boundary and trust model are in
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 The reproducible Arm64 migration and dual-architecture evidence contract is in
 [`docs/ARM_OPTIMIZATION.md`](docs/ARM_OPTIMIZATION.md).
+Native-package compatibility evidence is in
+[`docs/ARM_EVIDENCE.md`](docs/ARM_EVIDENCE.md).
 Judge-ready drafts and timed demo scripts are in
 [`docs/COCKROACHDB_SUBMISSION.md`](docs/COCKROACHDB_SUBMISSION.md),
 [`docs/COCKROACHDB_VIDEO_SCRIPT.md`](docs/COCKROACHDB_VIDEO_SCRIPT.md),

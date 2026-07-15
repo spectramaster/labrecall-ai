@@ -20,5 +20,12 @@ jobs:
       - run: .venv/bin/ruff check src tests scripts
       - run: .venv/bin/pytest -q
       - run: PYTHONPATH=src .venv/bin/python -m labrecall.benchmark >/dev/null
+      - name: Build and import the Linux x86_64 Lambda package
+        run: |
+          test "$(uname -m)" = "x86_64"
+          mkdir -p /tmp/labrecall-lambda
+          uv pip install --target /tmp/labrecall-lambda -r requirements-lambda.txt
+          cp -R src/labrecall /tmp/labrecall-lambda/labrecall
+          PYTHONPATH=/tmp/labrecall-lambda .venv/bin/python scripts/package_probe.py
       - name: Scan tracked files for secrets
         run: git ls-files -z | xargs -0 .venv/bin/detect-secrets-hook --
