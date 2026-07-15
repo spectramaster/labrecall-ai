@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: LabRecall AI public API on AWS Lambda
+
+Parameters:
+  DatabaseUrl:
+    Type: String
+    NoEcho: true
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 1024
+    Runtime: python3.12
+    Architectures: [arm64]
+    Environment:
+      Variables:
+        LABRECALL_MODE: cloud
+        DATABASE_URL: !Ref DatabaseUrl
+        BEDROCK_EMBED_MODEL: amazon.titan-embed-text-v2:0
+        BEDROCK_TEXT_MODEL: amazon.nova-lite-v1:0
+
+Resources:
+  LabRecallApi:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../../
+      Handler: labrecall.app.handler
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: bedrock:InvokeModel
+              Resource:
+                - !Sub arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/amazon.titan-embed-text-v2:0
+                - !Sub arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/amazon.nova-lite-v1:0
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+
+Outputs:
+  ApiUrl:
+    Value: !Sub https://${ServerlessHttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}
