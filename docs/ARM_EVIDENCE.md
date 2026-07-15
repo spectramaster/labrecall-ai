@@ -36,10 +36,12 @@ cross-architecture proof completed from commit `5bb6d14`:
 
 Commit `4f9f979` added a second job on GitHub's hosted `ubuntu-24.04-arm` runner.
 Both jobs build the Lambda target on the target CPU, import the native `psycopg-binary`
-wheel, run the same package probe, and upload a short-lived deployment artifact.
+wheel, run the same package probe, and upload a short-lived deployment artifact. Commit
+`59cf41a` changed each artifact to contain the Lambda package directly at the archive
+root, added a path-safe SAM installer, and passed the full 12-test suite.
 
-- Workflow run: <https://github.com/spectramaster/labrecall-ai/actions/runs/29453148414>
-- `package-arm64`: `success` in 17 seconds
+- Latest workflow run: <https://github.com/spectramaster/labrecall-ai/actions/runs/29453587601>
+- `package-arm64`: `success`
 - Native Arm64 probe:
 
   ```json
@@ -47,14 +49,14 @@ wheel, run the same package probe, and upload a short-lived deployment artifact.
   ```
 
 - `verify` (x86_64): `success`
-- Uploaded artifacts: `labrecall-linux-arm64` (28,484,956 bytes) and
-  `labrecall-linux-x86_64` (27,060,828 bytes)
+- Uploaded artifacts: `labrecall-linux-arm64` (29,288,672 bytes) and
+  `labrecall-linux-x86_64` (27,747,093 bytes)
 - Artifact expiry: 2026-07-22 UTC. The workflow can regenerate both from the same commit;
   the archives are deployment inputs, not permanent evidence.
 
 ## Remaining evidence
 
-- Build in AWS Lambda's architecture-matched SAM container.
+- Deploy the exact target-native archives to their matching Lambda architectures.
 - Verify `/health` reports `aarch64` and `x86_64` on the two deployed stacks.
 - Run correctness and end-to-end comparison from the same commit and region.
 - Capture Lambda Power Tuning and Arm Performix evidence.
