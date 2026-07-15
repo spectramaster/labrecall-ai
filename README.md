@@ -2,6 +2,8 @@
 
 **A research-pipeline repair agent that remembers what actually worked.**
 
+![LabRecall AI project cover](docs/assets/labrecall-cover.png)
+
 ![LabRecall AI web interface](docs/assets/labrecall-ui.jpg)
 
 LabRecall turns failed computational-research runs into durable, governed memory.
@@ -89,6 +91,12 @@ The deployable system boundary and trust model are in
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 The reproducible Arm64 migration and dual-architecture evidence contract is in
 [`docs/ARM_OPTIMIZATION.md`](docs/ARM_OPTIMIZATION.md).
+Judge-ready drafts and timed demo scripts are in
+[`docs/COCKROACHDB_SUBMISSION.md`](docs/COCKROACHDB_SUBMISSION.md),
+[`docs/COCKROACHDB_VIDEO_SCRIPT.md`](docs/COCKROACHDB_VIDEO_SCRIPT.md),
+[`docs/ARM_SUBMISSION.md`](docs/ARM_SUBMISSION.md), and
+[`docs/ARM_VIDEO_SCRIPT.md`](docs/ARM_VIDEO_SCRIPT.md). Hard placeholders remain until
+the corresponding live cloud evidence is verified.
 
 ## Read-only Managed MCP auditor
 
