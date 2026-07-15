@@ -1,0 +1,29 @@
+[Unit]
+Description=LabRecall AI outcome-gated memory service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ec2-user
+Group=ec2-user
+WorkingDirectory=/home/ec2-user/labrecall-ai
+EnvironmentFile=/etc/labrecall/labrecall.env
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/home/ec2-user/labrecall-ai/.venv/bin/uvicorn labrecall.app:app --host 127.0.0.1 --port 8000 --workers 1
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=15
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target

@@ -10,7 +10,8 @@ LabRecall turns failed computational-research runs into durable, governed memory
 For each incident it stores structured state and an embedding in CockroachDB, retrieves
 semantically similar failures through CockroachDB's distributed vector index, proposes
 a bounded repair plan, and learns from the human-confirmed outcome. The public service
-is designed for AWS Lambda and Amazon Bedrock.
+is designed for a cost-bounded Amazon Lightsail deployment with a fixed database egress
+IP, a Lightsail HTTPS distribution, and Amazon Bedrock.
 
 This is a new project for the 2026 CockroachDB × AWS Build with Agentic Memory
 Hackathon. It was started during the official submission period. No ReproFrame source
@@ -44,27 +45,30 @@ commits are surfaced for operation-ID inspection instead of being blindly replay
   live schema, memory quality, and safe aggregate statistics with auditable access.
 - **CockroachDB Agent Skills:** the official schema and statement-analysis skills drive
   reproducible database reviews; their outputs will be checked into an evidence ledger.
-- **AWS Lambda:** hosts the public event-driven API.
+- **Amazon Lightsail:** hosts the public FastAPI service behind a fixed egress IP and a
+  CDN distribution with a default HTTPS domain.
 - **Amazon Bedrock:** Titan creates embeddings and Nova generates evidence-bounded repair
   explanations; fixture mode remains fully offline for tests.
+- **AWS Lambda:** the same Mangum package is retained for Arm64 versus x86_64 sponsor
+  measurement; it is not required for the primary public demo.
 
 ## Local foundation
 
 ```bash
-uv venv --python 3.12
-uv pip install --python .venv/bin/python -e '.[dev]'
-.venv/bin/pytest -q
-PYTHONPATH=src .venv/bin/python -m labrecall.benchmark
-.venv/bin/uvicorn labrecall.app:app --reload
+uv sync --extra dev --locked
+uv run pytest -q
+PYTHONPATH=src uv run python -m labrecall.benchmark
+PYTHONPATH=src uv run uvicorn labrecall.app:app --reload
 ```
 
 The default `LABRECALL_MODE=fixture` uses deterministic embeddings and an in-memory
 repository. Set `LABRECALL_MODE=cloud`, `DATABASE_URL`, and AWS settings only in a local
 `.env` or deployment secret store. Never commit credentials.
 
-The Lambda template reads the database URL from AWS Secrets Manager at cold start;
-CloudFormation receives only the secret ARN. Its IAM policy allows only the two declared
-Bedrock models and that one secret.
+The primary Lightsail runtime reads its database URL and Bedrock-specific bearer token
+from a root-owned server environment file. The browser never receives either value.
+The alternative Lambda template reads the database URL from AWS Secrets Manager at cold
+start; CloudFormation receives only the secret ARN.
 
 For a credentialed CockroachDB smoke test without persisting the connection string:
 
@@ -95,6 +99,8 @@ Native-package compatibility evidence is in
 [`docs/ARM_EVIDENCE.md`](docs/ARM_EVIDENCE.md).
 The credential-safe, cost-bounded CloudShell deployment procedure is in
 [`docs/AWS_DEPLOYMENT_RUNBOOK.md`](docs/AWS_DEPLOYMENT_RUNBOOK.md).
+The fixed-egress public deployment is in
+[`docs/LIGHTSAIL_DEPLOYMENT.md`](docs/LIGHTSAIL_DEPLOYMENT.md).
 The sponsor-grade measurement boundaries are in
 [`docs/LAMBDA_POWER_TUNING.md`](docs/LAMBDA_POWER_TUNING.md) and
 [`docs/PERFORMIX_PLAN.md`](docs/PERFORMIX_PLAN.md).

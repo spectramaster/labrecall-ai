@@ -15,18 +15,17 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.12"
-      - run: uv venv
-      - run: uv pip install -e '.[dev]'
-      - run: .venv/bin/ruff check src tests scripts
-      - run: .venv/bin/pytest -q
-      - run: PYTHONPATH=src .venv/bin/python -m labrecall.benchmark >/dev/null
+      - run: uv sync --extra dev --locked
+      - run: uv run ruff check src tests scripts
+      - run: uv run pytest -q
+      - run: PYTHONPATH=src uv run python -m labrecall.benchmark >/dev/null
       - name: Build and import the Linux x86_64 Lambda package
         run: |
           test "$(uname -m)" = "x86_64"
           mkdir -p /tmp/labrecall-lambda
           uv pip install --target /tmp/labrecall-lambda -r requirements-lambda.txt
           cp -R src/labrecall /tmp/labrecall-lambda/labrecall
-          PYTHONPATH=/tmp/labrecall-lambda .venv/bin/python scripts/package_probe.py
+          PYTHONPATH=/tmp/labrecall-lambda uv run python scripts/package_probe.py
       - name: Upload the verified x86_64 Lambda package
         uses: actions/upload-artifact@v4
         with:
@@ -35,7 +34,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
       - name: Scan tracked files for secrets
-        run: git ls-files -z | xargs -0 .venv/bin/detect-secrets-hook --
+        run: git ls-files -z | xargs -0 uv run detect-secrets-hook --
 
   package-arm64:
     runs-on: ubuntu-24.04-arm
@@ -44,14 +43,14 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.12"
-      - run: uv venv
+      - run: uv sync --extra dev --locked
       - name: Build and import the native Linux arm64 Lambda package
         run: |
           test "$(uname -m)" = "aarch64"
           mkdir -p /tmp/labrecall-lambda
           uv pip install --target /tmp/labrecall-lambda -r requirements-lambda.txt
           cp -R src/labrecall /tmp/labrecall-lambda/labrecall
-          PYTHONPATH=/tmp/labrecall-lambda .venv/bin/python scripts/package_probe.py
+          PYTHONPATH=/tmp/labrecall-lambda uv run python scripts/package_probe.py
       - name: Upload the verified arm64 Lambda package
         uses: actions/upload-artifact@v4
         with:

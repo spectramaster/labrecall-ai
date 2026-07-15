@@ -56,12 +56,14 @@ drift that appears when operational state and embeddings live in separate databa
 The live Basic cluster uses namespace-scoped rows, least-privilege SQL, TLS, and no
 `0.0.0.0/0` network rule.
 
-The AWS service runs FastAPI through Mangum on Lambda behind an HTTP API. Amazon Bedrock
+The public AWS service runs FastAPI on Amazon Lightsail behind Nginx and a Lightsail CDN
+distribution. The instance's fixed IPv4 is the only cloud address in CockroachDB's SQL
+allowlist, while the distribution supplies a free HTTPS testing URL. Amazon Bedrock
 Titan creates embeddings, while Nova produces evidence-bounded explanations. If Nova is
 unavailable, LabRecall falls back to deterministic language and returns
 `generation_degraded=true`; it does not silently invent an unverified repair. The
-database connection string stays in Secrets Manager, and the Lambda role can read only
-that secret and invoke the two declared Bedrock models.
+database URL and time-bounded Bedrock exploration key stay in a root-owned server file
+and are removed after judging.
 
 ## CockroachDB tools used
 
@@ -87,12 +89,13 @@ resulting fixes are preserved in `docs/SKILL_EVIDENCE.md`.
 
 ## AWS services used
 
-- **AWS Lambda:** serverless execution on Arm64 with bounded concurrency.
-- **Amazon API Gateway HTTP API:** public routing with burst and sustained throttles.
+- **Amazon Lightsail:** fixed-egress application hosting on the first-use instance trial.
+- **Lightsail CDN distribution:** default HTTPS domain and uncached dynamic routing.
 - **Amazon Bedrock Titan:** cloud embedding generation.
 - **Amazon Bedrock Nova Lite:** evidence-bounded explanation generation.
-- **AWS Secrets Manager:** server-side storage of the single database connection secret.
-- **CloudWatch:** structured request, latency, error, and Lambda runtime evidence.
+- **Lightsail monitoring:** instance and distribution request/health evidence.
+- **AWS Lambda:** a separate Arm64/x86_64 package is used for reproducible architecture
+  measurement, not for the public database path.
 
 ## Challenges we ran into
 
@@ -114,12 +117,16 @@ without allowing model text to become truth automatically.
 - Live recall returned the confirmed repair at cosine similarity `0.737865` with
   calibrated confidence `0.666667`.
 - Four memory types share a single transactional and vector-capable database.
+- A one-click isolated proof visibly demonstrates cold abstention, human promotion,
+  paraphrased recall, provenance IDs, confidence, and the ordered audit trail.
+- Browser sessions map to hashed database namespaces, so public tests do not contaminate
+  one another.
 - The public service has bounded inputs, request IDs, safe errors, security headers,
   throttling, concurrency limits, deterministic degradation, and readiness checks.
 - The synthetic benchmark separates retrieval quality from generation and reports
   memory-on versus memory-off behavior without presenting fixture embeddings as model
   quality.
-- Ten automated tests and GitHub Actions currently pass from a clean public repository.
+- Fifteen automated tests and GitHub Actions currently pass from a clean public repository.
 
 ## What we learned
 
@@ -143,12 +150,15 @@ promotion, and automated retention controls for sensitive scientific environment
 ## Testing instructions
 
 1. Open `<VERIFIED_AWS_DEMO_URL>`; no account or credential should be required.
-2. Submit the supplied synthetic calibration-drift incident.
-3. Verify that the recommendation names its generation path and requires human approval.
-4. Record the supplied successful synthetic outcome.
-5. Submit the paraphrased repeat incident and verify that the evidence card cites the
-   learned memory, similarity, confidence, and confirmed repair.
-6. The demo contains synthetic data only. Do not enter personal, confidential, or
+2. Select **Run the 20-second proof**.
+3. Verify the three completed stages: cold abstention, human-confirmed promotion, and
+   paraphrased warm recall.
+4. Inspect the evidence card for memory ID, similarity, calibrated confidence, decision
+   score, and the confirmed repair.
+5. Inspect the governance timeline for the ordered incident, retrieval, recommendation,
+   outcome, and promotion events.
+6. Optionally submit another supplied synthetic incident and record its outcome.
+7. The demo contains synthetic data only. Do not enter personal, confidential, or
    proprietary research information.
 
 ## Optional product feedback

@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     bedrock_text_model: str = "amazon.nova-lite-v1:0"
     memory_namespace: str = "public-demo"
     retrieval_limit: int = 5
+    retrieval_min_similarity: float = 0.65
     embedding_dimensions: int = 1024
 
 

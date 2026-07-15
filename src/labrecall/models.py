@@ -29,6 +29,7 @@ class RecalledMemory(BaseModel):
     successful_outcomes: int
     failed_outcomes: int
     confidence: float = Field(ge=0.0, le=1.0)
+    ranking_score: float = Field(default=0.0, ge=-1.0, le=1.0)
 
 
 class Recommendation(BaseModel):
@@ -62,6 +63,14 @@ class MemoryStats(BaseModel):
     outcomes: int
     reusable_memories: int
     audit_events: int
+
+
+class AuditEvent(BaseModel):
+    created_at: datetime
+    event_type: str
+    subject_id: UUID
+    evidence_ids: list[UUID] = Field(default_factory=list)
+    detail: dict[str, object] = Field(default_factory=dict)
 
 
 class ErrorResponse(BaseModel):

@@ -11,7 +11,7 @@ import psycopg
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
-from labrecall.models import IncidentInput, MemoryStats, OutcomeInput, RecalledMemory
+from labrecall.models import AuditEvent, IncidentInput, MemoryStats, OutcomeInput, RecalledMemory
 
 T = TypeVar("T")
 CONSOLIDATION_THRESHOLD = 0.92
@@ -39,6 +39,8 @@ class MemoryStore(Protocol):
 
     def stats(self) -> MemoryStats: ...
 
+    def recent_audit_events(self, limit: int) -> list[AuditEvent]: ...
+
 
 @dataclass
 class LocalMemoryStore:
@@ -46,14 +48,32 @@ class LocalMemoryStore:
     outcomes: dict[UUID, OutcomeInput] = field(default_factory=dict)
     memories: dict[UUID, tuple[str, str, list[float], int, int]] = field(default_factory=dict)
     promoted: dict[UUID, UUID] = field(default_factory=dict)
-    audit_events: list[tuple[datetime, str, UUID]] = field(default_factory=list)
+    audit_events: list[AuditEvent] = field(default_factory=list)
+
+    def _audit(
+        self,
+        event_type: str,
+        subject_id: UUID,
+        *,
+        evidence_ids: list[UUID] | None = None,
+        detail: dict[str, object] | None = None,
+    ) -> None:
+        self.audit_events.append(
+            AuditEvent(
+                created_at=datetime.now(UTC),
+                event_type=event_type,
+                subject_id=subject_id,
+                evidence_ids=evidence_ids or [],
+                detail=detail or {},
+            )
+        )
 
     def create_incident(
         self, incident_id: UUID, incident: IncidentInput, embedding: list[float]
     ) -> None:
         if incident_id not in self.incidents:
             self.incidents[incident_id] = (incident, embedding)
-            self.audit_events.append((datetime.now(UTC), "incident.created", incident_id))
+            self._audit("incident.created", incident_id, detail={"pipeline": incident.pipeline})
 
     @staticmethod
     def _similarity(left: list[float], right: list[float]) -> float:
@@ -74,6 +94,7 @@ class LocalMemoryStore:
                     successful_outcomes=worked,
                     failed_outcomes=failed,
                     confidence=(worked + 1) / (worked + failed + 2),
+                    ranking_score=similarity * ((worked + 1) / (worked + failed + 2)),
                 )
             )
         recalled.sort(
@@ -90,7 +111,7 @@ class LocalMemoryStore:
                 raise ValueError("outcome already recorded with different evidence")
             return self.promoted.get(incident_id)
         self.outcomes[incident_id] = outcome
-        self.audit_events.append((datetime.now(UTC), "outcome.recorded", incident_id))
+        self._audit("outcome.recorded", incident_id, detail={"status": outcome.status})
         incident, embedding = self.incidents[incident_id]
 
         nearest: tuple[UUID, float] | None = None
@@ -106,8 +127,11 @@ class LocalMemoryStore:
                 memory_id = nearest[0]
                 signature, action, vector, worked, failed = self.memories[memory_id]
                 self.memories[memory_id] = (signature, action, vector, worked, failed + 1)
-                self.audit_events.append(
-                    (datetime.now(UTC), "memory.confidence_updated", memory_id)
+                self._audit(
+                    "memory.confidence_updated",
+                    memory_id,
+                    evidence_ids=[incident_id],
+                    detail={"outcome_status": "failed"},
                 )
             return None
         if outcome.status != "worked":
@@ -118,13 +142,23 @@ class LocalMemoryStore:
             signature, action, vector, worked, failed = self.memories[memory_id]
             self.memories[memory_id] = (signature, action, vector, worked + 1, failed)
             self.promoted[incident_id] = memory_id
-            self.audit_events.append((datetime.now(UTC), "memory.consolidated", memory_id))
+            self._audit(
+                "memory.consolidated",
+                memory_id,
+                evidence_ids=[incident_id],
+                detail={"outcome_status": "worked"},
+            )
             return memory_id
 
         memory_id = uuid4()
         self.memories[memory_id] = (incident.error, outcome.action_taken, embedding, 1, 0)
         self.promoted[incident_id] = memory_id
-        self.audit_events.append((datetime.now(UTC), "memory.promoted", memory_id))
+        self._audit(
+            "memory.promoted",
+            memory_id,
+            evidence_ids=[incident_id],
+            detail={"outcome_status": "worked"},
+        )
         return memory_id
 
     def record_recommendation(
@@ -133,8 +167,18 @@ class LocalMemoryStore:
         evidence_ids: list[UUID],
         detail: dict[str, object],
     ) -> None:
-        self.audit_events.append((datetime.now(UTC), "memory.retrieved", incident_id))
-        self.audit_events.append((datetime.now(UTC), "recommendation.created", incident_id))
+        self._audit(
+            "memory.retrieved",
+            incident_id,
+            evidence_ids=evidence_ids,
+            detail={"retrieved_count": len(evidence_ids)},
+        )
+        self._audit(
+            "recommendation.created",
+            incident_id,
+            evidence_ids=evidence_ids,
+            detail=detail,
+        )
 
     def stats(self) -> MemoryStats:
         return MemoryStats(
@@ -143,6 +187,9 @@ class LocalMemoryStore:
             reusable_memories=len(self.memories),
             audit_events=len(self.audit_events),
         )
+
+    def recent_audit_events(self, limit: int) -> list[AuditEvent]:
+        return list(reversed(self.audit_events[-limit:]))
 
 
 def _vector_literal(vector: list[float]) -> str:
@@ -253,6 +300,10 @@ class CockroachMemoryStore:
                         successful_outcomes=row["successful_outcomes"],
                         failed_outcomes=row["failed_outcomes"],
                         confidence=float(row["confidence"]),
+                        ranking_score=(
+                            float(row["similarity"])
+                            * float(row["confidence"])
+                        ),
                     )
                     for row in rows
                 ]
@@ -437,6 +488,32 @@ class CockroachMemoryStore:
                     ),
                 )
                 return memory_id
+
+        return self._transaction(operation)
+
+    def recent_audit_events(self, limit: int) -> list[AuditEvent]:
+        def operation(connection: psycopg.Connection) -> list[AuditEvent]:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT created_at, event_type, subject_id, evidence_ids, detail
+                    FROM audit_events
+                    WHERE namespace = %s
+                    ORDER BY created_at DESC
+                    LIMIT %s
+                    """,
+                    (self.namespace, limit),
+                )
+                return [
+                    AuditEvent(
+                        created_at=row["created_at"],
+                        event_type=row["event_type"],
+                        subject_id=row["subject_id"],
+                        evidence_ids=list(row["evidence_ids"] or []),
+                        detail=dict(row["detail"] or {}),
+                    )
+                    for row in cursor.fetchall()
+                ]
 
         return self._transaction(operation)
 

@@ -54,6 +54,49 @@ CASES = (
         "Python numerical workflow",
         "Record dependency hashes and seed every stochastic library at process start.",
     ),
+    BenchmarkCase(
+        "unit-conversion",
+        "pressure supplied in kPa while the forward model expects Pa caused residual explosion",
+        "retrieval residuals diverged because pressure units were kPa instead of Pa",
+        "Python spectroscopy retrieval",
+        "Normalize pressure to Pa at the input boundary and assert the accepted unit.",
+    ),
+    BenchmarkCase(
+        "stale-checkpoint-lock",
+        "a preempted worker left a stale checkpoint lock on shared storage",
+        "checkpoint resume was blocked by an orphaned lock after worker preemption",
+        "distributed Python job and shared storage",
+        "Verify lock ownership and expiry before removing only the stale checkpoint lock.",
+    ),
+    BenchmarkCase(
+        "timestamp-order",
+        "partition merge interleaved sensor timestamps and broke windowed aggregation",
+        "window features changed because merged sensor rows were no longer time ordered",
+        "partitioned sensor pipeline",
+        "Apply a stable timestamp sort and reject duplicate sequence identifiers "
+        "before aggregation.",
+    ),
+)
+
+NEGATIVE_CONTROLS = (
+    IncidentInput(
+        pipeline="browser authentication",
+        error="OAuth access token expired and the API returned HTTP 401",
+        environment="TypeScript single-page application",
+        constraints=["do not expose tokens"],
+    ),
+    IncidentInput(
+        pipeline="image annotation",
+        error="bounding-box class labels shifted after geometric augmentation",
+        environment="computer-vision training dataset",
+        constraints=["preserve source images"],
+    ),
+    IncidentInput(
+        pipeline="database migration",
+        error="concurrent index creation deadlocked with a schema migration",
+        environment="transactional SQL service",
+        constraints=["avoid blocking production writes"],
+    ),
 )
 
 
@@ -68,8 +111,19 @@ def _incident(error: str, environment: str) -> IncidentInput:
 
 def run_benchmark() -> dict[str, object]:
     embedder = HashEmbedder(256)
-    memory_agent = RepairAgent(LocalMemoryStore(), embedder, retrieval_limit=3)
-    baseline_agent = RepairAgent(LocalMemoryStore(), embedder, retrieval_limit=0)
+    selection_threshold = 0.65
+    memory_agent = RepairAgent(
+        LocalMemoryStore(),
+        embedder,
+        retrieval_limit=3,
+        retrieval_min_similarity=selection_threshold,
+    )
+    baseline_agent = RepairAgent(
+        LocalMemoryStore(),
+        embedder,
+        retrieval_limit=0,
+        retrieval_min_similarity=selection_threshold,
+    )
 
     for case in CASES:
         recommendation = memory_agent.analyze(_incident(case.training_error, case.environment))
@@ -106,21 +160,62 @@ def run_benchmark() -> dict[str, object]:
             {
                 "case": case.name,
                 "top1_correct": top1_correct,
-                "memory_similarity": round(with_memory.evidence[0].similarity, 4),
-                "memory_confidence": round(with_memory.evidence[0].confidence, 4),
+                "memory_similarity": (
+                    round(with_memory.evidence[0].similarity, 4)
+                    if with_memory.evidence
+                    else None
+                ),
+                "memory_confidence": (
+                    round(with_memory.evidence[0].confidence, 4)
+                    if with_memory.evidence
+                    else None
+                ),
                 "baseline_abstained": not without_memory.evidence,
             }
         )
 
+    negative_abstentions = sum(
+        not memory_agent.analyze(control).evidence for control in NEGATIVE_CONTROLS
+    )
+
+    calibration_store = LocalMemoryStore()
+    calibration_agent = RepairAgent(
+        calibration_store,
+        embedder,
+        retrieval_min_similarity=selection_threshold,
+    )
+    calibration_case = CASES[0]
+    calibration_incident = _incident(
+        calibration_case.training_error,
+        calibration_case.environment,
+    )
+    confidence_path: list[float] = []
+    for status in ("worked", "worked", "failed"):
+        recommendation = calibration_agent.analyze(calibration_incident)
+        calibration_agent.learn(
+            recommendation.incident_id,
+            OutcomeInput(
+                status=status,
+                action_taken=calibration_case.repair,
+                observation=f"Synthetic acceptance result recorded as {status}.",
+            ),
+        )
+        recalled = calibration_store.recall(embedder.embed(calibration_incident.memory_text()), 1)
+        confidence_path.append(round(recalled[0].confidence, 4))
+
     total = len(CASES)
     return {
-        "benchmark": "synthetic research-pipeline repair recall",
-        "cases": total,
+        "benchmark": "synthetic outcome-gated repair-memory systems check",
+        "benchmark_version": "2.0",
+        "positive_cases": total,
+        "negative_controls": len(NEGATIVE_CONTROLS),
+        "selection_threshold": selection_threshold,
         "fixture_embedding": "deterministic signed token hash; not a model-quality claim",
         "memory_on": {
             "top1_accuracy": correct / total,
             "retrieval_precision_at_1": correct / retrieved if retrieved else 0.0,
             "retrieval_recall_at_1": correct / total,
+            "negative_abstention_rate": negative_abstentions / len(NEGATIVE_CONTROLS),
             "mean_latency_ms": round(statistics.mean(memory_latencies), 3),
         },
         "memory_off": {
@@ -128,6 +223,17 @@ def run_benchmark() -> dict[str, object]:
             "abstention_rate": 1.0,
             "mean_latency_ms": round(statistics.mean(baseline_latencies), 3),
         },
+        "outcome_calibration": {
+            "sequence": ["worked", "worked", "failed"],
+            "confidence_path": confidence_path,
+            "memories_after_three_outcomes": calibration_store.stats().reusable_memories,
+            "interpretation": "success consolidates; confirmed failed reuse lowers confidence",
+        },
+        "limitations": [
+            "This checks system semantics and deterministic retrieval, not "
+            "foundation-model quality.",
+            "Cloud Titan embeddings must be evaluated separately with the same frozen cases.",
+        ],
         "rows": rows,
     }
 

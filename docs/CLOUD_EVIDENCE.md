@@ -7,8 +7,9 @@
 - Cost guardrail: $15 monthly hard limit; $0 due at creation; no payment method added
 - SQL user: `labrecall_app`
 - Granted privileges: `SELECT`, `INSERT`, and `UPDATE` only on the four application tables
-- Network: removed the default `0.0.0.0/0` rule; only the current development device is
-  allowlisted while the AWS egress design is pending
+- Network: removed the default `0.0.0.0/0` rule; the AWS allowlist contains only the
+  Lightsail static IPv4 `32.184.180.92/32` under
+  `labrecall-lightsail-static-ip`
 - Tables: `incidents`, `outcomes`, `repair_memories`, `audit_events`
 - Vector indexes: `incidents_embedding_idx`, `repair_memories_embedding_idx`
 - Browser-shell synthetic proof: inserted one incident, confirmed outcome, promoted
@@ -31,8 +32,10 @@ default on current Basic clusters.
   transcript. The server configuration and OAuth authorization are already complete,
   but the client that performed setup cannot hot-load a new MCP server.
 - Run the pinned official transaction, SQL, and cloud-security Agent Skills.
-- Deploy the Lambda package after the AWS account owner completes console sign-in.
-- Add only the final AWS egress CIDR to the allowlist before cloud runtime verification.
+- Deploy the public FastAPI service to the existing Lightsail instance, create the
+  first-year-free 50 GB distribution, and verify its default HTTPS domain.
+- Create a time-bounded Bedrock API key for the synthetic demo, store it only in the
+  root-owned server environment file, and delete it after judging.
 
 ## 2026-07-16 — Managed MCP access boundary
 

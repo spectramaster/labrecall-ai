@@ -21,6 +21,9 @@ only from confirmed outcomes.
 - [x] Retrieve similar incidents with deterministic local embeddings in fixture mode.
 - [x] Require a confirmed outcome before promoting a repair into semantic memory.
 - [x] Make every recommendation cite the memory IDs that influenced it.
+- [x] Add similarity abstention, outcome-weighted ranking, and visible decision scores.
+- [x] Isolate browser demo sessions with hashed CockroachDB namespaces.
+- [x] Expose a provenance-safe audit timeline and one-click cold → confirm → recall proof.
 
 ### M2 — real CockroachDB integration
 
@@ -33,14 +36,17 @@ only from confirmed outcomes.
 ### M3 — AWS application
 
 - [ ] Use Bedrock Titan embeddings and Nova for evidence-bounded explanations.
-- [x] Package the FastAPI service for AWS Lambda with Mangum and a deterministic Make build.
+- [x] Prepare a hardened Lightsail systemd/Nginx deployment with fixed CockroachDB egress.
+- [x] Package the same FastAPI service for AWS Lambda/Arm measurement with Mangum.
 - [ ] Deploy a free-to-test public endpoint with protected server-side secrets.
 - [x] Add rate limits, input bounds, structured errors, logs, and health checks.
 
 ### M4 — evaluation and submission
 
-- [x] Build a synthetic multi-session research-pipeline benchmark.
-- [x] Compare memory-on versus memory-off repair quality, repetition, and latency.
+- [x] Build a frozen synthetic benchmark with positive cases, unrelated controls, and
+  outcome-calibration checks.
+- [x] Compare memory-on versus memory-off retrieval, abstention, latency, consolidation,
+  and negative-feedback behavior.
 - [ ] Record a real under-three-minute demo showing the CockroachDB memory layer.
 - [ ] Publish the deployed app, demo video, and final evidence ledger (code and architecture published).
 - [ ] Submit early and verify the final public Devpost page.

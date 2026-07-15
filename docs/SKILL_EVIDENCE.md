@@ -27,8 +27,8 @@ Pinned source: `third_party/cockroachdb-skills` at
 
 - TLS is required by CockroachDB Cloud; no certificate bypass is configured.
 - The default `0.0.0.0/0` allowlist entry was removed.
-- Only the current development device is allowlisted; the future AWS runtime must add a
-  narrowly scoped egress CIDR rather than restoring allow-all.
+- The public AWS runtime uses the Lightsail static IPv4 `32.184.180.92/32`; the
+  allowlist never restored an allow-all rule.
 - `labrecall_app` has only `SELECT`, `INSERT`, and `UPDATE` on application tables.
 - No credentials are committed; `.env` and deployment configuration are ignored.
 - Cluster spend is capped at $15/month, with $0 due at creation and no payment method

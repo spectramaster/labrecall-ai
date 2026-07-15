@@ -13,19 +13,25 @@ class RepairAgent:
         embedder: Embedder,
         mode: str = "fixture",
         retrieval_limit: int = 5,
+        retrieval_min_similarity: float = 0.65,
         explainer: Explainer | None = None,
     ) -> None:
         self.store = store
         self.embedder = embedder
         self.mode = mode
         self.retrieval_limit = retrieval_limit
+        self.retrieval_min_similarity = retrieval_min_similarity
         self.explainer = explainer
 
     def analyze(self, incident: IncidentInput) -> Recommendation:
         incident_id = uuid4()
         embedding = self.embedder.embed(incident.memory_text())
         self.store.create_incident(incident_id, incident, embedding)
-        evidence = self.store.recall(embedding, self.retrieval_limit)
+        candidates = self.store.recall(embedding, self.retrieval_limit)
+        evidence = [
+            item for item in candidates if item.similarity >= self.retrieval_min_similarity
+        ]
+        evidence.sort(key=lambda item: item.ranking_score, reverse=True)
 
         if evidence:
             strongest = evidence[0]
@@ -38,7 +44,8 @@ class RepairAgent:
                 "A prior confirmed repair is semantically similar; verify its assumptions "
                 "before reuse. "
                 f"Memory similarity: {strongest.similarity:.3f}; "
-                f"outcome confidence: {strongest.confidence:.3f}."
+                f"outcome confidence: {strongest.confidence:.3f}; "
+                f"decision score: {strongest.ranking_score:.3f}."
             )
         else:
             actions = [

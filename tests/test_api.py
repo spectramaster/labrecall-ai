@@ -67,6 +67,31 @@ def test_health_and_memory_lifecycle() -> None:
     assert ready.status_code == 200
     assert ready.json()["status"] == "ready"
 
+    timeline = client.get("/api/memory/timeline?limit=5")
+    assert timeline.status_code == 200
+    assert timeline.json()[0]["event_type"] == "memory.promoted"
+    assert timeline.json()[0]["evidence_ids"] == [incident_id]
+
+
+def test_browser_sessions_are_isolated() -> None:
+    get_agent.cache_clear()
+    client = TestClient(app)
+    headers_a = {"x-labrecall-session": "judge-a"}
+    headers_b = {"x-labrecall-session": "judge-b"}
+
+    incident = client.post(
+        "/api/incidents",
+        headers=headers_a,
+        json={
+            "pipeline": "spectral calibration",
+            "error": "dark-reference drift after warm restart",
+            "environment": "synthetic fixture",
+        },
+    )
+    assert incident.status_code == 200
+    assert client.get("/api/memory/stats", headers=headers_a).json()["incidents"] == 1
+    assert client.get("/api/memory/stats", headers=headers_b).json()["incidents"] == 0
+
 
 def test_power_tuning_payload_reaches_the_mangum_handler() -> None:
     template = json.loads(

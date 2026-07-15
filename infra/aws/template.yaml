@@ -34,6 +34,7 @@ Globals:
         LABRECALL_MODE: cloud
         DATABASE_SECRET_ARN: !Ref DatabaseSecretArn
         MEMORY_NAMESPACE: !Ref MemoryNamespace
+        RETRIEVAL_MIN_SIMILARITY: "0.65"
         BEDROCK_EMBED_MODEL: amazon.titan-embed-text-v2:0
         BEDROCK_TEXT_MODEL: amazon.nova-lite-v1:0
 

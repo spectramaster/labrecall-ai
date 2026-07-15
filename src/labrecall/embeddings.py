@@ -1,6 +1,7 @@
 import hashlib
 import json
 import math
+import re
 from typing import Protocol
 
 
@@ -16,12 +17,17 @@ class HashEmbedder:
 
     def embed(self, text: str) -> list[float]:
         vector = [0.0] * self.dimensions
-        tokens = text.lower().split()
-        for token in tokens:
-            digest = hashlib.sha256(token.encode()).digest()
+        tokens = re.findall(r"[a-z0-9]+", text.lower())
+        features = [(token, 1.0) for token in tokens]
+        features.extend(
+            (f"{left}::{right}", 1.5)
+            for left, right in zip(tokens, tokens[1:], strict=False)
+        )
+        for feature, weight in features:
+            digest = hashlib.sha256(feature.encode()).digest()
             index = int.from_bytes(digest[:4], "big") % self.dimensions
             sign = 1.0 if digest[4] & 1 else -1.0
-            vector[index] += sign
+            vector[index] += sign * weight
         norm = math.sqrt(sum(value * value for value in vector)) or 1.0
         return [value / norm for value in vector]
 

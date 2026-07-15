@@ -7,7 +7,7 @@ from pathlib import Path
 from uuid import UUID, uuid4
 
 import boto3
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from mangum import Mangum
@@ -18,6 +18,7 @@ from labrecall.embeddings import BedrockTitanEmbedder, HashEmbedder
 from labrecall.generation import BedrockNovaExplainer
 from labrecall.memory import CockroachMemoryStore, LocalMemoryStore
 from labrecall.models import (
+    AuditEvent,
     ErrorResponse,
     IncidentInput,
     MemoryStats,
@@ -26,7 +27,7 @@ from labrecall.models import (
     Recommendation,
 )
 
-app = FastAPI(title="LabRecall AI", version="0.1.0")
+app = FastAPI(title="LabRecall AI", version="0.2.0")
 logger = logging.getLogger("labrecall")
 static_dir = Path(__file__).parent / "static"
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
@@ -107,13 +108,24 @@ def _database_url() -> str:
     return secret["DATABASE_URL"]
 
 
-@lru_cache
-def get_agent() -> RepairAgent:
+def _session_namespace(session_id: str | None) -> str:
     settings = get_settings()
+    if not session_id:
+        return settings.memory_namespace
+    import hashlib
+
+    suffix = hashlib.sha256(session_id.encode()).hexdigest()[:12]
+    return f"{settings.memory_namespace}-{suffix}"
+
+
+@lru_cache(maxsize=128)
+def get_agent(session_id: str | None = None) -> RepairAgent:
+    settings = get_settings()
+    namespace = _session_namespace(session_id)
     if settings.labrecall_mode == "cloud":
         bedrock = boto3.client("bedrock-runtime", region_name=settings.aws_region)
         return RepairAgent(
-            store=CockroachMemoryStore(_database_url(), settings.memory_namespace),
+            store=CockroachMemoryStore(_database_url(), namespace),
             embedder=BedrockTitanEmbedder(
                 bedrock,
                 settings.bedrock_embed_model,
@@ -121,6 +133,7 @@ def get_agent() -> RepairAgent:
             ),
             mode=settings.labrecall_mode,
             retrieval_limit=settings.retrieval_limit,
+            retrieval_min_similarity=settings.retrieval_min_similarity,
             explainer=BedrockNovaExplainer(bedrock, settings.bedrock_text_model),
         )
     return RepairAgent(
@@ -128,6 +141,7 @@ def get_agent() -> RepairAgent:
         embedder=HashEmbedder(settings.embedding_dimensions),
         mode=settings.labrecall_mode,
         retrieval_limit=settings.retrieval_limit,
+        retrieval_min_similarity=settings.retrieval_min_similarity,
     )
 
 
@@ -136,7 +150,7 @@ def health() -> dict[str, str]:
     return {
         "status": "ok",
         "mode": get_settings().labrecall_mode,
-        "version": "0.1.0",
+        "version": "0.2.0",
         "architecture": platform.machine(),
     }
 
@@ -147,26 +161,45 @@ def home() -> FileResponse:
 
 
 @app.get("/ready")
-def readiness() -> dict[str, object]:
-    return {"status": "ready", "memory": get_agent().store.stats().model_dump()}
+def readiness(x_labrecall_session: str | None = Header(default=None)) -> dict[str, object]:
+    return {
+        "status": "ready",
+        "memory": get_agent(x_labrecall_session).store.stats().model_dump(),
+    }
 
 
 @app.post("/api/incidents", response_model=Recommendation)
-def analyze_incident(incident: IncidentInput) -> Recommendation:
-    return get_agent().analyze(incident)
+def analyze_incident(
+    incident: IncidentInput,
+    x_labrecall_session: str | None = Header(default=None),
+) -> Recommendation:
+    return get_agent(x_labrecall_session).analyze(incident)
 
 
 @app.post("/api/incidents/{incident_id}/outcome", response_model=OutcomeReceipt)
-def record_outcome(incident_id: UUID, outcome: OutcomeInput) -> OutcomeReceipt:
+def record_outcome(
+    incident_id: UUID,
+    outcome: OutcomeInput,
+    x_labrecall_session: str | None = Header(default=None),
+) -> OutcomeReceipt:
     try:
-        return get_agent().learn(incident_id, outcome)
+        return get_agent(x_labrecall_session).learn(incident_id, outcome)
     except KeyError as error:
         raise HTTPException(status_code=404, detail="Incident not found") from error
 
 
 @app.get("/api/memory/stats", response_model=MemoryStats)
-def memory_stats() -> MemoryStats:
-    return get_agent().store.stats()
+def memory_stats(x_labrecall_session: str | None = Header(default=None)) -> MemoryStats:
+    return get_agent(x_labrecall_session).store.stats()
+
+
+@app.get("/api/memory/timeline", response_model=list[AuditEvent])
+def memory_timeline(
+    limit: int = 20,
+    x_labrecall_session: str | None = Header(default=None),
+) -> list[AuditEvent]:
+    bounded_limit = min(max(limit, 1), 50)
+    return get_agent(x_labrecall_session).store.recent_audit_events(bounded_limit)
 
 
 handler = Mangum(app)

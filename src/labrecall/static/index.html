@@ -31,6 +31,13 @@
           <li><span>04</span> Promote evidence to memory</li>
         </ol>
       </div>
+      <div class="proof-bar">
+        <div>
+          <strong>See memory change the decision</strong>
+          <span>Runs a fresh, isolated cold → confirm → recall proof with synthetic data.</span>
+        </div>
+        <button class="proof-button" type="button" id="proof-button">Run the 20-second proof</button>
+      </div>
     </header>
 
     <main>
@@ -39,6 +46,24 @@
         <div><strong id="stat-outcomes">—</strong><span>outcomes</span></div>
         <div><strong id="stat-memories">—</strong><span>reusable memories</span></div>
         <div><strong id="stat-audits">—</strong><span>audit events</span></div>
+      </section>
+
+      <section class="lifecycle" id="lifecycle" aria-label="Guided memory proof">
+        <article data-proof-stage="cold">
+          <span>01 · Cold start</span>
+          <strong>Agent abstains</strong>
+          <p>No confirmed repair is available, so LabRecall proposes bounded diagnostics.</p>
+        </article>
+        <article data-proof-stage="confirm">
+          <span>02 · Human outcome</span>
+          <strong>Evidence is promoted</strong>
+          <p>A repair becomes reusable only after a person records a successful check.</p>
+        </article>
+        <article data-proof-stage="recall">
+          <span>03 · Warm recall</span>
+          <strong>Agent cites the memory</strong>
+          <p>A paraphrased failure retrieves the confirmed action with provenance.</p>
+        </article>
       </section>
 
       <div class="workspace">
@@ -121,6 +146,20 @@ Preserve verified artifacts</textarea>
           <p id="message" class="message" role="status"></p>
         </section>
       </div>
+
+      <section class="audit-panel" aria-labelledby="audit-heading">
+        <div class="panel-heading">
+          <div>
+            <p class="step-label">Governance memory</p>
+            <h2 id="audit-heading">Auditable decision trail</h2>
+          </div>
+          <span class="privacy">Session-isolated synthetic namespace</span>
+        </div>
+        <p class="audit-intro">Every capture, retrieval, recommendation, human outcome,
+          promotion, consolidation, and confidence update is written as an ordered event.</p>
+        <ol id="timeline" class="timeline"></ol>
+        <p id="timeline-empty" class="timeline-empty">Run an analysis to create the first audit event.</p>
+      </section>
     </main>
 
     <footer>

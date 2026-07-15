@@ -2,17 +2,18 @@
 
 ```mermaid
 flowchart LR
-    U["Researcher browser"] -->|"HTTPS incident and outcome"| G["Amazon API Gateway"]
-    G -->|"5 req/s, burst 10"| L["AWS Lambda / FastAPI"]
+    U["Researcher browser"] -->|"HTTPS incident and outcome"| D["Amazon Lightsail CDN"]
+    D -->|"uncached dynamic origin"| N["Nginx rate limit"]
+    N -->|"localhost only"| L["Lightsail FastAPI service"]
     L -->|"Titan embedding"| B["Amazon Bedrock"]
     L -->|"Nova bounded explanation"| B
-    L -->|"TLS + least-privilege SQL"| C["CockroachDB Cloud Basic"]
+    L -->|"TLS from static egress IP"| C["CockroachDB Cloud Basic"]
     C --> V["Distributed vector indexes"]
     C --> T["Transactional outcomes"]
     C --> A["Governance audit events"]
     S["Codex read-only MCP auditor"] -->|"OAuth mcp:read"| M["CockroachDB Managed MCP"]
     M --> C
-    K["AWS Secrets Manager"] -->|"One DATABASE_URL secret"| L
+    K["Root-owned environment file"] -->|"DB URL + Bedrock bearer token"| L
 ```
 
 ## Core transaction
@@ -35,14 +36,19 @@ flowchart LR
 - A Bedrock explanation failure falls back to deterministic, human-reviewable language
   and marks `generation_degraded=true`.
 - API errors return a request ID without exposing database or cloud exception text.
-- Lambda concurrency is capped at two; API Gateway throttles excess traffic.
+- Nginx limits the public API to five requests/second with a burst of ten. The service
+  uses one worker on the bounded Lightsail instance.
 
 ## Data and access boundaries
 
 - The public demo accepts synthetic inputs only and never executes proposed commands.
 - `labrecall_app` has only `SELECT`, `INSERT`, and `UPDATE` on application tables.
-- The development cluster has no `0.0.0.0/0` allowlist entry.
+- The development cluster has no `0.0.0.0/0` allowlist entry; only the Lightsail static
+  IPv4 address and an explicitly approved development address are allowed.
 - The committed MCP configuration exposes only read-oriented tools and authenticates with
   OAuth scope `mcp:read`; write tools are absent from the allowlist.
-- The Lambda receives only a Secrets Manager ARN from CloudFormation. Its execution role
-  can invoke two named Bedrock models and read one named secret.
+- Browser sessions are mapped to hashed CockroachDB namespaces, preventing one judge's
+  synthetic proof from affecting another judge's cold start.
+- Lightsail does not support service roles. For this time-bounded exploration demo, the
+  Bedrock-specific API key and database URL live in one root-owned `0640` environment
+  file and are removed after judging. The browser never receives either secret.

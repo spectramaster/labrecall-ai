@@ -1,53 +1,96 @@
 {
-  "benchmark": "synthetic research-pipeline repair recall",
-  "cases": 5,
+  "benchmark": "synthetic outcome-gated repair-memory systems check",
+  "benchmark_version": "2.0",
   "fixture_embedding": "deterministic signed token hash; not a model-quality claim",
+  "limitations": [
+    "This checks system semantics and deterministic retrieval, not foundation-model quality.",
+    "Cloud Titan embeddings must be evaluated separately with the same frozen cases."
+  ],
   "memory_off": {
     "abstention_rate": 1.0,
-    "mean_latency_ms": 0.045,
+    "mean_latency_ms": 0.091,
     "top1_accuracy": 0.0
   },
   "memory_on": {
-    "mean_latency_ms": 0.208,
+    "mean_latency_ms": 0.342,
+    "negative_abstention_rate": 1.0,
     "retrieval_precision_at_1": 1.0,
-    "retrieval_recall_at_1": 1.0,
-    "top1_accuracy": 1.0
+    "retrieval_recall_at_1": 0.875,
+    "top1_accuracy": 0.875
   },
+  "negative_controls": 3,
+  "outcome_calibration": {
+    "confidence_path": [
+      0.6667,
+      0.75,
+      0.6
+    ],
+    "interpretation": "success consolidates; confirmed failed reuse lowers confidence",
+    "memories_after_three_outcomes": 1,
+    "sequence": [
+      "worked",
+      "worked",
+      "failed"
+    ]
+  },
+  "positive_cases": 8,
   "rows": [
     {
       "baseline_abstained": true,
       "case": "gpu-oom",
       "memory_confidence": 0.6667,
-      "memory_similarity": 0.8681,
+      "memory_similarity": 0.8416,
       "top1_correct": true
     },
     {
       "baseline_abstained": true,
       "case": "checkpoint-atomicity",
       "memory_confidence": 0.6667,
-      "memory_similarity": 0.7504,
+      "memory_similarity": 0.7319,
       "top1_correct": true
     },
     {
       "baseline_abstained": true,
       "case": "spectral-drift",
       "memory_confidence": 0.6667,
-      "memory_similarity": 0.8002,
+      "memory_similarity": 0.804,
       "top1_correct": true
     },
     {
       "baseline_abstained": true,
       "case": "schema-drift",
       "memory_confidence": 0.6667,
-      "memory_similarity": 0.6822,
+      "memory_similarity": 0.6696,
       "top1_correct": true
     },
     {
       "baseline_abstained": true,
       "case": "seed-regression",
       "memory_confidence": 0.6667,
-      "memory_similarity": 0.681,
+      "memory_similarity": 0.7141,
+      "top1_correct": true
+    },
+    {
+      "baseline_abstained": true,
+      "case": "unit-conversion",
+      "memory_confidence": null,
+      "memory_similarity": null,
+      "top1_correct": false
+    },
+    {
+      "baseline_abstained": true,
+      "case": "stale-checkpoint-lock",
+      "memory_confidence": 0.6667,
+      "memory_similarity": 0.751,
+      "top1_correct": true
+    },
+    {
+      "baseline_abstained": true,
+      "case": "timestamp-order",
+      "memory_confidence": 0.6667,
+      "memory_similarity": 0.6775,
       "top1_correct": true
     }
-  ]
+  ],
+  "selection_threshold": 0.65
 }

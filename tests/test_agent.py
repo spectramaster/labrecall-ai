@@ -49,3 +49,25 @@ def test_failed_outcome_is_not_promoted() -> None:
     )
     assert receipt.learned is False
     assert store.stats().reusable_memories == 0
+
+
+def test_low_similarity_memory_is_rejected() -> None:
+    agent = RepairAgent(
+        LocalMemoryStore(),
+        HashEmbedder(64),
+        retrieval_min_similarity=0.99,
+    )
+    first = agent.analyze(incident())
+    agent.learn(
+        first.incident_id,
+        OutcomeInput(
+            status="worked",
+            action_taken="Reduce validation batch size from 64 to 16.",
+            observation="Validation completed.",
+        ),
+    )
+
+    unrelated = agent.analyze(incident("OAuth token expired during browser sign-in"))
+
+    assert unrelated.evidence == []
+    assert "No confirmed repair memory" in unrelated.summary

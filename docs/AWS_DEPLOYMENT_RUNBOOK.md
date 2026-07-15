@@ -1,8 +1,10 @@
 # AWS deployment runbook
 
-This runbook deliberately keeps AWS credentials and the CockroachDB connection string
-out of the repository, GitHub Actions, local shell history, and screenshots. The target
-region is `us-east-1`, where both declared Bedrock models are available.
+This runbook is the alternative Lambda/Arm measurement path. The primary public
+CockroachDB demo uses the fixed-egress Lightsail path in `docs/LIGHTSAIL_DEPLOYMENT.md`.
+This document keeps AWS credentials and the CockroachDB connection string out of the
+repository, GitHub Actions, local shell history, and screenshots. The target region is
+`us-east-1`, where both declared Bedrock models are available.
 
 ## Operator-only gates
 
@@ -29,8 +31,9 @@ Before deployment:
 - never put real research, personal, or confidential data in the demo cluster;
 - record the stack outputs so the emergency concurrency kill switch can be used.
 
-The CockroachDB Basic cluster currently accepts only an approved development network.
-Lambda does not have a stable public egress IP by default. Two valid choices remain:
+The CockroachDB Basic cluster accepts the Lightsail static IPv4 address. Lambda does not
+have a stable public egress IP by default. Two valid choices remain for short-lived
+architecture measurement:
 
 1. **Hackathon demo:** temporarily allow `0.0.0.0/0` for SQL only, never for the DB
    console, while retaining TLS, SCRAM authentication, least privilege, the USD 15 hard
@@ -38,7 +41,8 @@ Lambda does not have a stable public egress IP by default. Two valid choices rem
 2. **Hardened network:** use static AWS egress or CockroachDB private connectivity. This
    adds infrastructure and cost and is unnecessary for a synthetic short-lived demo.
 
-Do not change the allowlist until the account owner explicitly approves one choice.
+The public competition demo does not require either choice; keep its narrow Lightsail
+allowlist unless a Lambda comparison is deliberately scheduled.
 
 ## Preflight in AWS CloudShell
 
