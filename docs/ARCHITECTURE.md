@@ -2,8 +2,7 @@
 
 ```mermaid
 flowchart LR
-    U["Researcher browser"] -->|"HTTPS incident and outcome"| D["Amazon Lightsail CDN"]
-    D -->|"uncached dynamic origin"| N["Nginx rate limit"]
+    U["Researcher browser"] -->|"HTTPS incident and outcome"| N["Nginx with short-lived IP certificate"]
     N -->|"localhost only"| L["Lightsail FastAPI service"]
     L -->|"Titan embedding"| B["Amazon Bedrock"]
     L -->|"Nova bounded explanation"| B
@@ -38,6 +37,8 @@ flowchart LR
 - API errors return a request ID without exposing database or cloud exception text.
 - Nginx limits the public API to five requests/second with a burst of ten. The service
   uses one worker on the bounded Lightsail instance.
+- Let's Encrypt authenticates the static IPv4 directly with a six-day certificate;
+  Certbot checks renewal twice daily and reloads Nginx only after successful renewal.
 
 ## Data and access boundaries
 

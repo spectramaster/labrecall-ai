@@ -56,9 +56,10 @@ drift that appears when operational state and embeddings live in separate databa
 The live Basic cluster uses namespace-scoped rows, least-privilege SQL, TLS, and no
 `0.0.0.0/0` network rule.
 
-The public AWS service runs FastAPI on Amazon Lightsail behind Nginx and a Lightsail CDN
-distribution. The instance's fixed IPv4 is the only cloud address in CockroachDB's SQL
-allowlist, while the distribution supplies a free HTTPS testing URL. Amazon Bedrock
+The public AWS service runs FastAPI on Amazon Lightsail behind Nginx. The instance's
+fixed IPv4 is the only cloud address in CockroachDB's SQL allowlist, and a short-lived
+Let's Encrypt IP certificate supplies an automatically renewed HTTPS testing URL without
+adding a paid CDN. Amazon Bedrock
 Titan creates embeddings, while Nova produces evidence-bounded explanations. If Nova is
 unavailable, LabRecall falls back to deterministic language and returns
 `generation_degraded=true`; it does not silently invent an unverified repair. The
@@ -90,10 +91,11 @@ resulting fixes are preserved in `docs/SKILL_EVIDENCE.md`.
 ## AWS services used
 
 - **Amazon Lightsail:** fixed-egress application hosting on the first-use instance trial.
-- **Lightsail CDN distribution:** default HTTPS domain and uncached dynamic routing.
+- **Nginx + Let's Encrypt:** rate-limited HTTPS with an automatically renewed IP
+  certificate.
 - **Amazon Bedrock Titan:** cloud embedding generation.
 - **Amazon Bedrock Nova Lite:** evidence-bounded explanation generation.
-- **Lightsail monitoring:** instance and distribution request/health evidence.
+- **Lightsail monitoring:** instance and public request/health evidence.
 - **AWS Lambda:** a separate Arm64/x86_64 package is used for reproducible architecture
   measurement, not for the public database path.
 

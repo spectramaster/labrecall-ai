@@ -32,8 +32,8 @@ default on current Basic clusters.
   transcript. The server configuration and OAuth authorization are already complete,
   but the client that performed setup cannot hot-load a new MCP server.
 - Run the pinned official transaction, SQL, and cloud-security Agent Skills.
-- Deploy the public FastAPI service to the existing Lightsail instance, create the
-  first-year-free 50 GB distribution, and verify its default HTTPS domain.
+- Deploy the public FastAPI service to the existing Lightsail instance, issue an
+  automatically renewed Let's Encrypt IP certificate, and verify the public HTTPS URL.
 - Create a time-bounded Bedrock API key for the synthetic demo, store it only in the
   root-owned server environment file, and delete it after judging.
 

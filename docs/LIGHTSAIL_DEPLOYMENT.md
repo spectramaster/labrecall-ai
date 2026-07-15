@@ -11,12 +11,15 @@ but it is not required for the public CockroachDB demo.
 - Static IPv4: `32.184.180.92`
 - CockroachDB allowlist: `labrecall-lightsail-static-ip`, `32.184.180.92/32`
 - Instance bundle: USD 7/month with the first-use three-month trial
-- Distribution plan: 50 GB Lightsail CDN, free for the first year for eligible accounts
+- HTTPS: Let's Encrypt short-lived IP certificate, automatically renewed twice daily
 
-The CDN default domain provides HTTPS. The distribution must use the instance as its
-origin and disable caching for dynamic responses. The instance firewall exposes HTTP
-80 only after Nginx is installed and the local health check passes. SSH remains
-restricted; the browser SSH console is the operator path.
+The account's console prices the smallest Lightsail CDN plan at USD 2.50/month, so this
+deployment does not create it. Let's Encrypt has generally available IP certificates;
+Certbot 5.4 requests the required `shortlived` profile and renews the six-day certificate
+automatically. The instance firewall exposes HTTP 80 only after Nginx is installed and
+the local health check passes, then exposes HTTPS 443 after the certificate and TLS
+configuration validate. SSH remains restricted; the browser SSH console is the operator
+path.
 
 ## Secret boundary
 
@@ -72,6 +75,7 @@ sudo install -m 0644 infra/lightsail/labrecall-nginx-zone.conf \
   /etc/nginx/conf.d/labrecall-zone.conf
 sudo install -m 0644 infra/lightsail/labrecall-nginx-locations.conf \
   /etc/nginx/default.d/labrecall-locations.conf
+sudo install -d -m 0755 /var/www/letsencrypt/.well-known/acme-challenge
 
 sudo systemctl daemon-reload
 sudo systemctl enable --now labrecall
@@ -81,9 +85,35 @@ sudo systemctl enable --now nginx
 curl --fail --silent http://127.0.0.1/health
 ```
 
-Only after both local checks succeed, add TCP 80 to the Lightsail firewall and create a
-50 GB distribution with caching disabled. Verify the assigned HTTPS domain through the
-full cold → confirm → recall proof before recording it in Devpost.
+Only after both local checks succeed, add TCP 80 to the Lightsail firewall and verify
+`http://32.184.180.92/health`. Install Certbot 5.4 in an isolated Python 3.11 environment
+and request the production certificate:
+
+```bash
+sudo /home/ec2-user/labrecall-ai/.venv/bin/python -m venv /opt/certbot311
+sudo /opt/certbot311/bin/pip install certbot==5.4.0
+sudo /opt/certbot311/bin/certbot certonly \
+  --preferred-profile shortlived \
+  --webroot --webroot-path /var/www/letsencrypt \
+  --ip-address 32.184.180.92 \
+  --non-interactive --agree-tos --register-unsafely-without-email
+
+sudo install -m 0644 infra/lightsail/labrecall-nginx-tls.conf \
+  /etc/nginx/conf.d/labrecall-tls.conf
+sudo install -m 0644 infra/lightsail/labrecall-certbot.service \
+  /etc/systemd/system/labrecall-certbot.service
+sudo install -m 0644 infra/lightsail/labrecall-certbot.timer \
+  /etc/systemd/system/labrecall-certbot.timer
+sudo nginx -t
+sudo systemctl daemon-reload
+sudo systemctl enable --now labrecall-certbot.timer
+sudo systemctl reload nginx
+```
+
+Add TCP 443 only after `nginx -t` succeeds. Verify
+`https://32.184.180.92/health`, inspect the certificate expiry, and confirm that the
+renewal timer is active. Then run the full cold → confirm → recall proof before recording
+the URL in Devpost.
 
 Run the frozen benchmark against the same Bedrock Titan path used by the application:
 
@@ -109,6 +139,7 @@ sudo rm -f /etc/labrecall/labrecall.env
 sudo systemctl daemon-reload
 ```
 
-Also close TCP 80, delete the CDN distribution when it is no longer needed, and delete
-the Bedrock API key after judging. The zero-spend AWS Budget is an alert, not an
-automatic kill switch; review Lightsail billing before the instance trial ends.
+Also close TCP 80 and 443, remove the certificate-renewal timer, and delete the Bedrock
+API key after judging. No CDN distribution is required. The zero-spend AWS Budget is an
+alert, not an automatic kill switch; review Lightsail billing before the instance trial
+ends.

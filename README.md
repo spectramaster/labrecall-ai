@@ -11,7 +11,7 @@ For each incident it stores structured state and an embedding in CockroachDB, re
 semantically similar failures through CockroachDB's distributed vector index, proposes
 a bounded repair plan, and learns from the human-confirmed outcome. The public service
 is designed for a cost-bounded Amazon Lightsail deployment with a fixed database egress
-IP, a Lightsail HTTPS distribution, and Amazon Bedrock.
+IP, an automatically renewed Let's Encrypt IP certificate, and Amazon Bedrock.
 
 This is a new project for the 2026 CockroachDB × AWS Build with Agentic Memory
 Hackathon. It was started during the official submission period. No ReproFrame source
@@ -45,8 +45,8 @@ commits are surfaced for operation-ID inspection instead of being blindly replay
   live schema, memory quality, and safe aggregate statistics with auditable access.
 - **CockroachDB Agent Skills:** the official schema and statement-analysis skills drive
   reproducible database reviews; their outputs will be checked into an evidence ledger.
-- **Amazon Lightsail:** hosts the public FastAPI service behind a fixed egress IP and a
-  CDN distribution with a default HTTPS domain.
+- **Amazon Lightsail:** hosts the public FastAPI service behind a fixed egress IP and
+  Nginx with an automatically renewed, short-lived Let's Encrypt IP certificate.
 - **Amazon Bedrock:** Titan creates embeddings and Nova generates evidence-bounded repair
   explanations; fixture mode remains fully offline for tests.
 - **AWS Lambda:** the same Mangum package is retained for Arm64 versus x86_64 sponsor
