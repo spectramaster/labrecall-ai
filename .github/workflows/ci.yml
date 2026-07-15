@@ -27,5 +27,39 @@ jobs:
           uv pip install --target /tmp/labrecall-lambda -r requirements-lambda.txt
           cp -R src/labrecall /tmp/labrecall-lambda/labrecall
           PYTHONPATH=/tmp/labrecall-lambda .venv/bin/python scripts/package_probe.py
+          cd /tmp/labrecall-lambda
+          zip -qr "$GITHUB_WORKSPACE/labrecall-linux-x86_64.zip" .
+      - name: Upload the verified x86_64 Lambda package
+        uses: actions/upload-artifact@v4
+        with:
+          name: labrecall-linux-x86_64
+          path: labrecall-linux-x86_64.zip
+          if-no-files-found: error
+          retention-days: 7
       - name: Scan tracked files for secrets
         run: git ls-files -z | xargs -0 .venv/bin/detect-secrets-hook --
+
+  package-arm64:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+      - run: uv venv
+      - name: Build and import the native Linux arm64 Lambda package
+        run: |
+          test "$(uname -m)" = "aarch64"
+          mkdir -p /tmp/labrecall-lambda
+          uv pip install --target /tmp/labrecall-lambda -r requirements-lambda.txt
+          cp -R src/labrecall /tmp/labrecall-lambda/labrecall
+          PYTHONPATH=/tmp/labrecall-lambda .venv/bin/python scripts/package_probe.py
+          cd /tmp/labrecall-lambda
+          zip -qr "$GITHUB_WORKSPACE/labrecall-linux-arm64.zip" .
+      - name: Upload the verified arm64 Lambda package
+        uses: actions/upload-artifact@v4
+        with:
+          name: labrecall-linux-arm64
+          path: labrecall-linux-arm64.zip
+          if-no-files-found: error
+          retention-days: 7

@@ -18,13 +18,19 @@ was available inside it.
 
 ## Linux x86_64 package proof
 
-The public GitHub Actions runner is an actual `ubuntu-latest` x86_64 environment. CI now
+The public GitHub Actions runner is an actual `ubuntu-latest` x86_64 environment. CI
 builds a fresh Lambda target from `requirements-lambda.txt`, copies the application, and
-runs `scripts/package_probe.py` through only the packaged target. Record the first
-successful run URL and emitted JSON here after the workflow completes:
+runs `scripts/package_probe.py` through only the packaged target. The first successful
+cross-architecture proof completed from commit `5bb6d14`:
 
-- Workflow run: `<PENDING_CI_RUN_URL>`
-- Probe output: `<PENDING_X86_PROBE_JSON>`
+- Workflow run: <https://github.com/spectramaster/labrecall-ai/actions/runs/29452817397>
+- Job: `verify` (`success`)
+- Step: `Build and import the Linux x86_64 Lambda package` (`success`)
+- Probe output:
+
+  ```json
+  {"application": "LabRecall AI", "architecture": "x86_64", "psycopg_version": "3.3.4", "static_assets": ["app.css", "app.js", "index.html"]}
+  ```
 
 ## Remaining evidence
 
