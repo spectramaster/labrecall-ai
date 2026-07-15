@@ -87,6 +87,8 @@ The pinned official Agent Skills review is in
 [`docs/SKILL_EVIDENCE.md`](docs/SKILL_EVIDENCE.md).
 The deployable system boundary and trust model are in
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+The reproducible Arm64 migration and dual-architecture evidence contract is in
+[`docs/ARM_OPTIMIZATION.md`](docs/ARM_OPTIMIZATION.md).
 
 ## Read-only Managed MCP auditor
 

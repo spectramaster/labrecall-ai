@@ -1,5 +1,6 @@
 import json
 import logging
+import platform
 import time
 from functools import lru_cache
 from pathlib import Path
@@ -132,7 +133,12 @@ def get_agent() -> RepairAgent:
 
 @app.get("/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "mode": get_settings().labrecall_mode, "version": "0.1.0"}
+    return {
+        "status": "ok",
+        "mode": get_settings().labrecall_mode,
+        "version": "0.1.0",
+        "architecture": platform.machine(),
+    }
 
 
 @app.get("/", include_in_schema=False)

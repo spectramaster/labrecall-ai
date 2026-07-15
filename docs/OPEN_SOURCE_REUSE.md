@@ -19,6 +19,7 @@ application runtime.
 | --- | --- | --- | --- |
 | [JordanMcCann/agentmemory](https://github.com/JordanMcCann/agentmemory) | MIT | `3aa3b8389896f81dd813fdf9176ef3ca122d809e` | Validate writes, consolidate near-duplicates, calibrate confidence from outcomes, and evaluate recall separately from generation. |
 | [aws-samples/sample-amazon-bedrock-agentcore-fullstack-webapp](https://github.com/aws-samples/sample-amazon-bedrock-agentcore-fullstack-webapp) | MIT-0 | `7a9e70f3abc879b736f0011657462023746f0c36` | Keep AWS infrastructure explicit, secrets server-side, model permissions narrow, and the browser client separated from cloud credentials. |
+| [alexcasalboni/aws-lambda-power-tuning](https://github.com/alexcasalboni/aws-lambda-power-tuning) | Apache-2.0 | `572eaf7ac6155c950df358f7cca9a5cb3a247ee9` | Use the upstream Step Functions workflow after AWS deployment to measure cost and duration across Lambda memory configurations. No source is vendored or copied. |
 
 ## Decisions
 

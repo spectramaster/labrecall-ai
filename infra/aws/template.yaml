@@ -6,13 +6,24 @@ Parameters:
   DatabaseSecretArn:
     Type: String
     Description: ARN of a Secrets Manager JSON secret containing DATABASE_URL
+  Architecture:
+    Type: String
+    Default: arm64
+    AllowedValues: [arm64, x86_64]
+    Description: Lambda instruction-set architecture used for a reproducible comparison
+  MemoryNamespace:
+    Type: String
+    Default: public-demo
+    AllowedPattern: "^[a-z0-9-]{3,40}$"
+    Description: Isolated CockroachDB namespace for this deployment
 
 Globals:
   Function:
     Timeout: 30
     MemorySize: 1024
     Runtime: python3.12
-    Architectures: [arm64]
+    Architectures:
+      - !Ref Architecture
     ReservedConcurrentExecutions: 2
     LoggingConfig:
       LogFormat: JSON
@@ -22,6 +33,7 @@ Globals:
       Variables:
         LABRECALL_MODE: cloud
         DATABASE_SECRET_ARN: !Ref DatabaseSecretArn
+        MEMORY_NAMESPACE: !Ref MemoryNamespace
         BEDROCK_EMBED_MODEL: amazon.titan-embed-text-v2:0
         BEDROCK_TEXT_MODEL: amazon.nova-lite-v1:0
 
@@ -62,3 +74,7 @@ Resources:
 Outputs:
   ApiUrl:
     Value: !Sub https://${LabRecallHttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}
+  Architecture:
+    Value: !Ref Architecture
+  MemoryNamespace:
+    Value: !Ref MemoryNamespace
