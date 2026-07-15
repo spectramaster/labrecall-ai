@@ -19,6 +19,7 @@ jobs:
       - run: uv run ruff check src tests scripts
       - run: uv run pytest -q
       - run: PYTHONPATH=src uv run python -m labrecall.benchmark >/dev/null
+      - run: PYTHONPATH=src uv run python scripts/bedrock_benchmark.py --help >/dev/null
       - name: Build and import the Linux x86_64 Lambda package
         run: |
           test "$(uname -m)" = "x86_64"

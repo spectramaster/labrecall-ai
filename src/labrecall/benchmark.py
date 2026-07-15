@@ -4,7 +4,7 @@ import time
 from dataclasses import dataclass
 
 from labrecall.agent import RepairAgent
-from labrecall.embeddings import HashEmbedder
+from labrecall.embeddings import Embedder, HashEmbedder
 from labrecall.memory import LocalMemoryStore
 from labrecall.models import IncidentInput, OutcomeInput
 
@@ -109,9 +109,13 @@ def _incident(error: str, environment: str) -> IncidentInput:
     )
 
 
-def run_benchmark() -> dict[str, object]:
-    embedder = HashEmbedder(256)
-    selection_threshold = 0.65
+def run_benchmark(
+    embedder: Embedder | None = None,
+    *,
+    embedding_label: str = "fixture signed token hash (256 dimensions)",
+    selection_threshold: float = 0.65,
+) -> dict[str, object]:
+    embedder = embedder or HashEmbedder(256)
     memory_agent = RepairAgent(
         LocalMemoryStore(),
         embedder,
@@ -210,7 +214,7 @@ def run_benchmark() -> dict[str, object]:
         "positive_cases": total,
         "negative_controls": len(NEGATIVE_CONTROLS),
         "selection_threshold": selection_threshold,
-        "fixture_embedding": "deterministic signed token hash; not a model-quality claim",
+        "embedding": embedding_label,
         "memory_on": {
             "top1_accuracy": correct / total,
             "retrieval_precision_at_1": correct / retrieved if retrieved else 0.0,

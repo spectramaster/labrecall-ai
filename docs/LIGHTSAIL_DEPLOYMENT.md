@@ -85,6 +85,22 @@ Only after both local checks succeed, add TCP 80 to the Lightsail firewall and c
 50 GB distribution with caching disabled. Verify the assigned HTTPS domain through the
 full cold → confirm → recall proof before recording it in Devpost.
 
+Run the frozen benchmark against the same Bedrock Titan path used by the application:
+
+```bash
+cd /home/ec2-user/labrecall-ai
+sudo systemd-run --pipe --wait --collect --uid=ec2-user \
+  --working-directory=/home/ec2-user/labrecall-ai \
+  --property=EnvironmentFile=/etc/labrecall/labrecall.env \
+  --setenv=PYTHONPATH=src \
+  /home/ec2-user/labrecall-ai/.venv/bin/python scripts/bedrock_benchmark.py
+```
+
+Review the JSON before preserving it. It must keep the eight positive cases, three
+unrelated controls, selection threshold, per-case rows, calibration path, and stated
+limitations. Do not replace the fixture evidence or claim Titan quality until this
+cloud run completes successfully.
+
 ## Rollback and cleanup
 
 ```bash

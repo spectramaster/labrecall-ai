@@ -1,7 +1,7 @@
 {
   "benchmark": "synthetic outcome-gated repair-memory systems check",
   "benchmark_version": "2.0",
-  "fixture_embedding": "deterministic signed token hash; not a model-quality claim",
+  "embedding": "fixture signed token hash (256 dimensions)",
   "limitations": [
     "This checks system semantics and deterministic retrieval, not foundation-model quality.",
     "Cloud Titan embeddings must be evaluated separately with the same frozen cases."
