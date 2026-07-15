@@ -23,7 +23,8 @@ path.
 
 ## Secret boundary
 
-The operator enters two values through hidden terminal prompts:
+The operator enters two values through hidden terminal prompts in
+`scripts/configure_lightsail_secrets.py`:
 
 - `DATABASE_URL`: the dedicated least-privilege `labrecall_app` CockroachDB URL;
 - `AWS_BEARER_TOKEN_BEDROCK`: a time-limited Bedrock API key created for this synthetic
@@ -37,20 +38,14 @@ project uses one only because Lightsail instances do not support service roles. 
 production deployment should use short-term credentials on a service that supports an
 IAM execution role.
 
+The helper accepts the dedicated SQL user's password rather than a hand-built URL. It
+URL-encodes arbitrary password characters, pins `sslmode=verify-full` and the downloaded
+CockroachDB CA certificate, then atomically installs the environment file. Neither
+secret appears in shell history, process arguments, or terminal output.
+
 ```bash
-read -rsp "CockroachDB DATABASE_URL: " DATABASE_URL; echo
-read -rsp "Bedrock bearer token: " AWS_BEARER_TOKEN_BEDROCK; echo
-printf '%s\n' \
-  "LABRECALL_MODE=cloud" \
-  "AWS_REGION=us-east-1" \
-  "MEMORY_NAMESPACE=public-demo" \
-  "RETRIEVAL_MIN_SIMILARITY=0.65" \
-  "DATABASE_URL=$DATABASE_URL" \
-  "AWS_BEARER_TOKEN_BEDROCK=$AWS_BEARER_TOKEN_BEDROCK" \
-  | sudo tee /etc/labrecall/labrecall.env >/dev/null
-sudo chown root:ec2-user /etc/labrecall/labrecall.env
-sudo chmod 0640 /etc/labrecall/labrecall.env
-unset DATABASE_URL AWS_BEARER_TOKEN_BEDROCK
+sudo .venv/bin/python scripts/configure_lightsail_secrets.py
+sudo systemctl restart labrecall
 ```
 
 ## Install and start
