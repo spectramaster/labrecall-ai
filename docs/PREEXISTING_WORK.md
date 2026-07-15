@@ -13,5 +13,5 @@ outcomes into governed long-term memory using CockroachDB and AWS. ReproFrame ge
 and verifies visual media using Genblaze and Backblaze B2.
 
 Standard open-source Python libraries are used under their published licenses. Official
-CockroachDB Agent Skills will be used unchanged for database review and clearly attributed
-when their evidence is added.
+CockroachDB Agent Skills are pinned unchanged as a Git submodule, used for database
+review, and attributed in `OPEN_SOURCE_REUSE.md` and `SKILL_EVIDENCE.md`.

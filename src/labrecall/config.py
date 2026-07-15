@@ -9,6 +9,7 @@ class Settings(BaseSettings):
 
     labrecall_mode: Literal["fixture", "cloud"] = "fixture"
     database_url: str | None = None
+    database_secret_arn: str | None = None
     aws_region: str = "us-east-1"
     bedrock_embed_model: str = "amazon.titan-embed-text-v2:0"
     bedrock_text_model: str = "amazon.nova-lite-v1:0"

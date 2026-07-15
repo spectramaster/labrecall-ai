@@ -1,0 +1,3 @@
+[submodule "third_party/cockroachdb-skills"]
+	path = third_party/cockroachdb-skills
+	url = https://github.com/cockroachlabs/cockroachdb-skills.git

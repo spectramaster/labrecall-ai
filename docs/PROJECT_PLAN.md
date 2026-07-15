@@ -17,18 +17,18 @@ only from confirmed outcomes.
 
 ### M1 — memory semantics
 
-- [ ] Implement episodic, semantic, outcome, and governance memory.
-- [ ] Retrieve similar incidents with deterministic local embeddings in fixture mode.
-- [ ] Require a confirmed outcome before promoting a repair into semantic memory.
-- [ ] Make every recommendation cite the memory IDs that influenced it.
+- [x] Implement episodic, semantic, outcome, and governance memory.
+- [x] Retrieve similar incidents with deterministic local embeddings in fixture mode.
+- [x] Require a confirmed outcome before promoting a repair into semantic memory.
+- [x] Make every recommendation cite the memory IDs that influenced it.
 
 ### M2 — real CockroachDB integration
 
-- [ ] Create a no-card CockroachDB Cloud cluster and least-privilege database user.
-- [ ] Apply the vector-enabled schema and distributed vector index.
-- [ ] Run a credentialed write → retrieve → outcome → learned-recall proof.
+- [x] Create a no-card CockroachDB Cloud cluster and least-privilege database user.
+- [x] Apply the vector-enabled schema and distributed vector index.
+- [x] Run a credentialed `labrecall_app` write → retrieve → outcome → learned-recall proof.
 - [ ] Connect a read-scoped Cloud Managed MCP auditor and preserve an evidence transcript.
-- [ ] Run relevant official Agent Skills and record their findings and fixes.
+- [x] Run relevant official Agent Skills and record their findings and fixes.
 
 ### M3 — AWS application
 
@@ -39,8 +39,8 @@ only from confirmed outcomes.
 
 ### M4 — evaluation and submission
 
-- [ ] Build a synthetic multi-session research-pipeline benchmark.
-- [ ] Compare memory-on versus memory-off repair quality, repetition, and latency.
+- [x] Build a synthetic multi-session research-pipeline benchmark.
+- [x] Compare memory-on versus memory-off repair quality, repetition, and latency.
 - [ ] Record a real under-three-minute demo showing the CockroachDB memory layer.
 - [ ] Publish code, architecture, test instructions, demo, and evidence ledger.
 - [ ] Submit early and verify the final public Devpost page.

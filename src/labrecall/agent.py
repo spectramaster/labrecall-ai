@@ -1,6 +1,7 @@
 from uuid import UUID, uuid4
 
 from labrecall.embeddings import Embedder
+from labrecall.generation import Explainer
 from labrecall.memory import MemoryStore
 from labrecall.models import IncidentInput, OutcomeInput, OutcomeReceipt, Recommendation
 
@@ -12,11 +13,13 @@ class RepairAgent:
         embedder: Embedder,
         mode: str = "fixture",
         retrieval_limit: int = 5,
+        explainer: Explainer | None = None,
     ) -> None:
         self.store = store
         self.embedder = embedder
         self.mode = mode
         self.retrieval_limit = retrieval_limit
+        self.explainer = explainer
 
     def analyze(self, incident: IncidentInput) -> Recommendation:
         incident_id = uuid4()
@@ -33,7 +36,9 @@ class RepairAgent:
             ]
             summary = (
                 "A prior confirmed repair is semantically similar; verify its assumptions "
-                f"before reuse. Memory similarity: {strongest.similarity:.3f}."
+                "before reuse. "
+                f"Memory similarity: {strongest.similarity:.3f}; "
+                f"outcome confidence: {strongest.confidence:.3f}."
             )
         else:
             actions = [
@@ -42,6 +47,9 @@ class RepairAgent:
                 "Record the observed outcome before promoting any repair to memory.",
             ]
             summary = "No confirmed repair memory was found; use a bounded diagnostic plan."
+
+        if self.explainer:
+            summary = self.explainer.explain(incident, evidence, actions)
 
         return Recommendation(
             incident_id=incident_id,

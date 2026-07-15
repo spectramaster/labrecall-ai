@@ -1,3 +1,4 @@
+import json
 from functools import lru_cache
 from uuid import UUID
 
@@ -8,6 +9,7 @@ from mangum import Mangum
 from labrecall.agent import RepairAgent
 from labrecall.config import get_settings
 from labrecall.embeddings import BedrockTitanEmbedder, HashEmbedder
+from labrecall.generation import BedrockNovaExplainer
 from labrecall.memory import CockroachMemoryStore, LocalMemoryStore
 from labrecall.models import (
     IncidentInput,
@@ -20,15 +22,27 @@ from labrecall.models import (
 app = FastAPI(title="LabRecall AI", version="0.1.0")
 
 
+def _database_url() -> str:
+    settings = get_settings()
+    if settings.database_url:
+        return settings.database_url
+    if not settings.database_secret_arn:
+        raise RuntimeError("DATABASE_URL or DATABASE_SECRET_ARN is required in cloud mode")
+    client = boto3.client("secretsmanager", region_name=settings.aws_region)
+    response = client.get_secret_value(SecretId=settings.database_secret_arn)
+    secret = json.loads(response["SecretString"])
+    if not isinstance(secret.get("DATABASE_URL"), str):
+        raise RuntimeError("secret must contain a DATABASE_URL string")
+    return secret["DATABASE_URL"]
+
+
 @lru_cache
 def get_agent() -> RepairAgent:
     settings = get_settings()
     if settings.labrecall_mode == "cloud":
-        if not settings.database_url:
-            raise RuntimeError("DATABASE_URL is required in cloud mode")
         bedrock = boto3.client("bedrock-runtime", region_name=settings.aws_region)
         return RepairAgent(
-            store=CockroachMemoryStore(settings.database_url, settings.memory_namespace),
+            store=CockroachMemoryStore(_database_url(), settings.memory_namespace),
             embedder=BedrockTitanEmbedder(
                 bedrock,
                 settings.bedrock_embed_model,
@@ -36,6 +50,7 @@ def get_agent() -> RepairAgent:
             ),
             mode=settings.labrecall_mode,
             retrieval_limit=settings.retrieval_limit,
+            explainer=BedrockNovaExplainer(bedrock, settings.bedrock_text_model),
         )
     return RepairAgent(
         store=LocalMemoryStore(),

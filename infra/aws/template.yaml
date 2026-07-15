@@ -3,9 +3,9 @@ Transform: AWS::Serverless-2016-10-31
 Description: LabRecall AI public API on AWS Lambda
 
 Parameters:
-  DatabaseUrl:
+  DatabaseSecretArn:
     Type: String
-    NoEcho: true
+    Description: ARN of a Secrets Manager JSON secret containing DATABASE_URL
 
 Globals:
   Function:
@@ -16,13 +16,15 @@ Globals:
     Environment:
       Variables:
         LABRECALL_MODE: cloud
-        DATABASE_URL: !Ref DatabaseUrl
+        DATABASE_SECRET_ARN: !Ref DatabaseSecretArn
         BEDROCK_EMBED_MODEL: amazon.titan-embed-text-v2:0
         BEDROCK_TEXT_MODEL: amazon.nova-lite-v1:0
 
 Resources:
   LabRecallApi:
     Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: makefile
     Properties:
       CodeUri: ../../
       Handler: labrecall.app.handler
@@ -33,6 +35,9 @@ Resources:
               Resource:
                 - !Sub arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/amazon.titan-embed-text-v2:0
                 - !Sub arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/amazon.nova-lite-v1:0
+            - Effect: Allow
+              Action: secretsmanager:GetSecretValue # pragma: allowlist secret
+              Resource: !Ref DatabaseSecretArn
       Events:
         Api:
           Type: HttpApi

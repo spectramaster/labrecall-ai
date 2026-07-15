@@ -1,0 +1,53 @@
+{
+  "benchmark": "synthetic research-pipeline repair recall",
+  "cases": 5,
+  "fixture_embedding": "deterministic signed token hash; not a model-quality claim",
+  "memory_off": {
+    "abstention_rate": 1.0,
+    "mean_latency_ms": 0.045,
+    "top1_accuracy": 0.0
+  },
+  "memory_on": {
+    "mean_latency_ms": 0.208,
+    "retrieval_precision_at_1": 1.0,
+    "retrieval_recall_at_1": 1.0,
+    "top1_accuracy": 1.0
+  },
+  "rows": [
+    {
+      "baseline_abstained": true,
+      "case": "gpu-oom",
+      "memory_confidence": 0.6667,
+      "memory_similarity": 0.8681,
+      "top1_correct": true
+    },
+    {
+      "baseline_abstained": true,
+      "case": "checkpoint-atomicity",
+      "memory_confidence": 0.6667,
+      "memory_similarity": 0.7504,
+      "top1_correct": true
+    },
+    {
+      "baseline_abstained": true,
+      "case": "spectral-drift",
+      "memory_confidence": 0.6667,
+      "memory_similarity": 0.8002,
+      "top1_correct": true
+    },
+    {
+      "baseline_abstained": true,
+      "case": "schema-drift",
+      "memory_confidence": 0.6667,
+      "memory_similarity": 0.6822,
+      "top1_correct": true
+    },
+    {
+      "baseline_abstained": true,
+      "case": "seed-regression",
+      "memory_confidence": 0.6667,
+      "memory_similarity": 0.681,
+      "top1_correct": true
+    }
+  ]
+}

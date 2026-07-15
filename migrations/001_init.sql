@@ -1,7 +1,5 @@
-SET CLUSTER SETTING feature.vector_index.enabled = true;
-
-CREATE DATABASE IF NOT EXISTS labrecall;
-SET DATABASE = labrecall;
+-- Run this migration against the target database in DATABASE_URL.
+-- Vector indexes are enabled by default on current CockroachDB Cloud Basic clusters.
 
 CREATE TABLE IF NOT EXISTS incidents (
     id UUID PRIMARY KEY,

@@ -17,7 +17,8 @@ jobs:
           python-version: "3.12"
       - run: uv venv
       - run: uv pip install -e '.[dev]'
-      - run: .venv/bin/ruff check src tests
+      - run: .venv/bin/ruff check src tests scripts
       - run: .venv/bin/pytest -q
+      - run: PYTHONPATH=src .venv/bin/python -m labrecall.benchmark >/dev/null
       - name: Scan tracked files for secrets
         run: git ls-files -z | xargs -0 .venv/bin/detect-secrets-hook --

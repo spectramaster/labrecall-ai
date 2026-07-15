@@ -27,6 +27,11 @@ of memory:
 CockroachDB is both the transactional source of truth and the vector store. A repair is
 never learned unless its outcome is recorded atomically.
 
+Repeated, semantically equivalent successes consolidate into one repair memory instead
+of inflating the store. Confirmed failed reuse lowers that memory's calibrated
+confidence. Transaction retries use exponential backoff with jitter, while ambiguous
+commits are surfaced for operation-ID inspection instead of being blindly replayed.
+
 ## Sponsor technology plan
 
 - **CockroachDB Distributed Vector Indexing:** runtime similarity search over failure
@@ -42,15 +47,27 @@ never learned unless its outcome is recorded atomically.
 ## Local foundation
 
 ```bash
-python -m venv .venv
-.venv/bin/pip install -e '.[dev]'
+uv venv --python 3.12
+uv pip install --python .venv/bin/python -e '.[dev]'
 .venv/bin/pytest -q
+PYTHONPATH=src .venv/bin/python -m labrecall.benchmark
 .venv/bin/uvicorn labrecall.app:app --reload
 ```
 
 The default `LABRECALL_MODE=fixture` uses deterministic embeddings and an in-memory
 repository. Set `LABRECALL_MODE=cloud`, `DATABASE_URL`, and AWS settings only in a local
 `.env` or deployment secret store. Never commit credentials.
+
+The Lambda template reads the database URL from AWS Secrets Manager at cold start;
+CloudFormation receives only the secret ARN. Its IAM policy allows only the two declared
+Bedrock models and that one secret.
+
+For a credentialed CockroachDB smoke test without persisting the connection string:
+
+```bash
+DATABASE_URL='postgresql://…' PYTHONPATH=src \
+  .venv/bin/python scripts/live_cockroach_proof.py
+```
 
 ## Safety boundary
 
@@ -61,4 +78,8 @@ proprietary research data.
 
 Official-rule verification and build gates are recorded in
 [`docs/OFFICIAL_RULES.md`](docs/OFFICIAL_RULES.md) and
-[`docs/PROJECT_PLAN.md`](docs/PROJECT_PLAN.md).
+[`docs/PROJECT_PLAN.md`](docs/PROJECT_PLAN.md). Open-source attribution and the live
+database proof are recorded in [`docs/OPEN_SOURCE_REUSE.md`](docs/OPEN_SOURCE_REUSE.md)
+and [`docs/CLOUD_EVIDENCE.md`](docs/CLOUD_EVIDENCE.md).
+The pinned official Agent Skills review is in
+[`docs/SKILL_EVIDENCE.md`](docs/SKILL_EVIDENCE.md).
