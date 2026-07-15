@@ -1,0 +1,43 @@
+{
+  "lambdaARN": "FUNCTION_ARN",
+  "powerValues": [512, 1024, 1536, 2048],
+  "num": 5,
+  "payload": {
+    "version": "2.0",
+    "routeKey": "POST /api/incidents",
+    "rawPath": "/api/incidents",
+    "rawQueryString": "",
+    "headers": {
+      "content-type": "application/json",
+      "host": "labrecall.example",
+      "x-forwarded-proto": "https"
+    },
+    "requestContext": {
+      "accountId": "anonymous",
+      "apiId": "power-tuning",
+      "domainName": "labrecall.example",
+      "domainPrefix": "labrecall",
+      "http": {
+        "method": "POST",
+        "path": "/api/incidents",
+        "protocol": "HTTP/1.1",
+        "sourceIp": "127.0.0.1",
+        "userAgent": "aws-lambda-power-tuning"
+      },
+      "requestId": "power-tuning-synthetic",
+      "routeKey": "POST /api/incidents",
+      "stage": "$default",
+      "time": "16/Jul/2026:00:00:00 +0000",
+      "timeEpoch": 1784160000000
+    },
+    "body": "{\"pipeline\":\"spectral reconstruction\",\"error\":\"Worker lost while publishing an atomic checkpoint\",\"environment\":\"Python 3.12, synthetic distributed job\",\"attempted_actions\":[],\"constraints\":[\"preserve the last verified checkpoint\"]}",
+    "isBase64Encoded": false
+  },
+  "parallelInvocation": false,
+  "strategy": "balanced",
+  "balancedWeight": 0.5,
+  "autoOptimize": false,
+  "discardTopBottom": 0.2,
+  "disablePayloadLogs": true,
+  "includeOutputResults": true
+}

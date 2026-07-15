@@ -95,6 +95,9 @@ Native-package compatibility evidence is in
 [`docs/ARM_EVIDENCE.md`](docs/ARM_EVIDENCE.md).
 The credential-safe, cost-bounded CloudShell deployment procedure is in
 [`docs/AWS_DEPLOYMENT_RUNBOOK.md`](docs/AWS_DEPLOYMENT_RUNBOOK.md).
+The sponsor-grade measurement boundaries are in
+[`docs/LAMBDA_POWER_TUNING.md`](docs/LAMBDA_POWER_TUNING.md) and
+[`docs/PERFORMIX_PLAN.md`](docs/PERFORMIX_PLAN.md).
 Judge-ready drafts and timed demo scripts are in
 [`docs/COCKROACHDB_SUBMISSION.md`](docs/COCKROACHDB_SUBMISSION.md),
 [`docs/COCKROACHDB_VIDEO_SCRIPT.md`](docs/COCKROACHDB_VIDEO_SCRIPT.md),

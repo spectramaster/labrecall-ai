@@ -1,6 +1,10 @@
+import json
+from pathlib import Path
+from types import SimpleNamespace
+
 from fastapi.testclient import TestClient
 
-from labrecall.app import app, get_agent
+from labrecall.app import app, get_agent, handler
 
 
 def test_health_and_memory_lifecycle() -> None:
@@ -62,3 +66,24 @@ def test_health_and_memory_lifecycle() -> None:
     ready = client.get("/ready")
     assert ready.status_code == 200
     assert ready.json()["status"] == "ready"
+
+
+def test_power_tuning_payload_reaches_the_mangum_handler() -> None:
+    template = json.loads(
+        Path("evidence/lambda-power-tuning-input.template.json").read_text()
+    )
+    get_agent.cache_clear()
+    context = SimpleNamespace(
+        function_name="labrecall-fixture",
+        function_version="$LATEST",
+        invoked_function_arn="arn:aws:lambda:us-east-1:000000000000:function:labrecall-fixture",
+        memory_limit_in_mb="1024",
+        aws_request_id="power-tuning-test",
+    )
+
+    response = handler(template["payload"], context)
+
+    assert response["statusCode"] == 200
+    body = json.loads(response["body"])
+    assert body["mode"] == "fixture"
+    assert body["requires_human_approval"] is True
