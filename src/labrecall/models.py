@@ -39,6 +39,8 @@ class Recommendation(BaseModel):
     evidence: list[RecalledMemory]
     requires_human_approval: bool = True
     mode: Literal["fixture", "cloud"]
+    generation_mode: Literal["deterministic", "bedrock"] = "deterministic"
+    generation_degraded: bool = False
 
 
 class OutcomeInput(BaseModel):
@@ -60,3 +62,8 @@ class MemoryStats(BaseModel):
     outcomes: int
     reusable_memories: int
     audit_events: int
+
+
+class ErrorResponse(BaseModel):
+    error: str
+    request_id: str

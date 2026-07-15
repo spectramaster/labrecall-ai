@@ -49,3 +49,22 @@ def test_nova_explainer_is_evidence_bounded() -> None:
     assert client.request is not None
     assert client.request["modelId"] == "amazon.nova-lite-v1:0"
     assert client.request["inferenceConfig"] == {"maxTokens": 180, "temperature": 0.0}
+
+
+class FailingExplainer:
+    def explain(self, *args: object) -> str:
+        raise RuntimeError("simulated Bedrock outage")
+
+
+def test_agent_falls_back_when_explainer_is_unavailable() -> None:
+    from labrecall.agent import RepairAgent
+    from labrecall.embeddings import HashEmbedder
+    from labrecall.memory import LocalMemoryStore
+
+    agent = RepairAgent(LocalMemoryStore(), HashEmbedder(32), explainer=FailingExplainer())
+    result = agent.analyze(
+        IncidentInput(pipeline="calibration", error="drift detected", environment="fixture")
+    )
+
+    assert result.generation_mode == "deterministic"
+    assert result.generation_degraded is True

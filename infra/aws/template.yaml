@@ -13,6 +13,11 @@ Globals:
     MemorySize: 1024
     Runtime: python3.12
     Architectures: [arm64]
+    ReservedConcurrentExecutions: 2
+    LoggingConfig:
+      LogFormat: JSON
+      ApplicationLogLevel: INFO
+      SystemLogLevel: WARN
     Environment:
       Variables:
         LABRECALL_MODE: cloud
@@ -21,6 +26,14 @@ Globals:
         BEDROCK_TEXT_MODEL: amazon.nova-lite-v1:0
 
 Resources:
+  LabRecallHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: $default
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 10
+        ThrottlingRateLimit: 5
+
   LabRecallApi:
     Type: AWS::Serverless::Function
     Metadata:
@@ -42,9 +55,10 @@ Resources:
         Api:
           Type: HttpApi
           Properties:
+            ApiId: !Ref LabRecallHttpApi
             Path: /{proxy+}
             Method: ANY
 
 Outputs:
   ApiUrl:
-    Value: !Sub https://${ServerlessHttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}
+    Value: !Sub https://${LabRecallHttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}

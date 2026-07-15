@@ -2,6 +2,8 @@
 
 **A research-pipeline repair agent that remembers what actually worked.**
 
+![LabRecall AI web interface](docs/assets/labrecall-ui.jpg)
+
 LabRecall turns failed computational-research runs into durable, governed memory.
 For each incident it stores structured state and an embedding in CockroachDB, retrieves
 semantically similar failures through CockroachDB's distributed vector index, proposes
@@ -83,3 +85,20 @@ database proof are recorded in [`docs/OPEN_SOURCE_REUSE.md`](docs/OPEN_SOURCE_RE
 and [`docs/CLOUD_EVIDENCE.md`](docs/CLOUD_EVIDENCE.md).
 The pinned official Agent Skills review is in
 [`docs/SKILL_EVIDENCE.md`](docs/SKILL_EVIDENCE.md).
+The deployable system boundary and trust model are in
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+## Read-only Managed MCP auditor
+
+Trusted Codex clients can load the project-scoped `.codex/config.toml` and authenticate
+with CockroachDB Cloud OAuth. The committed allowlist exposes only read-oriented schema,
+query, and plan-inspection tools; database-creation and insert tools are not enabled.
+
+```bash
+codex mcp login --scopes mcp:read cockroachdb-cloud
+codex mcp get cockroachdb-cloud
+```
+
+OAuth tokens stay in the local Codex credential store and are never committed. A new
+trusted Codex session is required after changing MCP configuration; the current client
+cannot hot-load a newly added server.

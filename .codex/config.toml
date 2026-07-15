@@ -1,0 +1,17 @@
+[mcp_servers.cockroachdb-cloud]
+url = "https://cockroachlabs.cloud/mcp"
+auth = "oauth"
+http_headers = { "mcp-cluster-id" = "971a9107-59d7-4795-bafc-9527c1ffbaf1" }
+enabled_tools = [
+  "list_clusters",
+  "get_cluster",
+  "list_databases",
+  "list_tables",
+  "get_table_schema",
+  "select_query",
+  "explain_query",
+  "show_running_queries",
+]
+default_tools_approval_mode = "auto"
+startup_timeout_sec = 20
+tool_timeout_sec = 60

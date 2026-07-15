@@ -27,22 +27,22 @@ only from confirmed outcomes.
 - [x] Create a no-card CockroachDB Cloud cluster and least-privilege database user.
 - [x] Apply the vector-enabled schema and distributed vector index.
 - [x] Run a credentialed `labrecall_app` write → retrieve → outcome → learned-recall proof.
-- [ ] Connect a read-scoped Cloud Managed MCP auditor and preserve an evidence transcript.
+- [ ] Preserve a live read-only MCP inspection transcript (OAuth and tool boundary are configured).
 - [x] Run relevant official Agent Skills and record their findings and fixes.
 
 ### M3 — AWS application
 
 - [ ] Use Bedrock Titan embeddings and Nova for evidence-bounded explanations.
-- [ ] Package the FastAPI service for AWS Lambda with Mangum.
+- [x] Package the FastAPI service for AWS Lambda with Mangum and a deterministic Make build.
 - [ ] Deploy a free-to-test public endpoint with protected server-side secrets.
-- [ ] Add rate limits, input bounds, structured errors, logs, and health checks.
+- [x] Add rate limits, input bounds, structured errors, logs, and health checks.
 
 ### M4 — evaluation and submission
 
 - [x] Build a synthetic multi-session research-pipeline benchmark.
 - [x] Compare memory-on versus memory-off repair quality, repetition, and latency.
 - [ ] Record a real under-three-minute demo showing the CockroachDB memory layer.
-- [ ] Publish code, architecture, test instructions, demo, and evidence ledger.
+- [ ] Publish the deployed app, demo video, and final evidence ledger (code and architecture published).
 - [ ] Submit early and verify the final public Devpost page.
 
 ## Judge-facing proof

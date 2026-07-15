@@ -30,6 +30,13 @@ class MemoryStore(Protocol):
 
     def record_outcome(self, incident_id: UUID, outcome: OutcomeInput) -> UUID | None: ...
 
+    def record_recommendation(
+        self,
+        incident_id: UUID,
+        evidence_ids: list[UUID],
+        detail: dict[str, object],
+    ) -> None: ...
+
     def stats(self) -> MemoryStats: ...
 
 
@@ -119,6 +126,15 @@ class LocalMemoryStore:
         self.promoted[incident_id] = memory_id
         self.audit_events.append((datetime.now(UTC), "memory.promoted", memory_id))
         return memory_id
+
+    def record_recommendation(
+        self,
+        incident_id: UUID,
+        evidence_ids: list[UUID],
+        detail: dict[str, object],
+    ) -> None:
+        self.audit_events.append((datetime.now(UTC), "memory.retrieved", incident_id))
+        self.audit_events.append((datetime.now(UTC), "recommendation.created", incident_id))
 
     def stats(self) -> MemoryStats:
         return MemoryStats(
@@ -423,6 +439,39 @@ class CockroachMemoryStore:
                 return memory_id
 
         return self._transaction(operation)
+
+    def record_recommendation(
+        self,
+        incident_id: UUID,
+        evidence_ids: list[UUID],
+        detail: dict[str, object],
+    ) -> None:
+        def operation(connection: psycopg.Connection) -> None:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    INSERT INTO audit_events
+                        (id, namespace, event_type, subject_id, evidence_ids, detail)
+                    VALUES
+                        (%s, %s, 'memory.retrieved', %s, %s, %s),
+                        (%s, %s, 'recommendation.created', %s, %s, %s)
+                    ON CONFLICT (id) DO NOTHING
+                    """,
+                    (
+                        uuid5(NAMESPACE_URL, f"retrieval:{self.namespace}:{incident_id}"),
+                        self.namespace,
+                        incident_id,
+                        evidence_ids,
+                        Jsonb({"retrieved_count": len(evidence_ids)}),
+                        uuid5(NAMESPACE_URL, f"recommendation:{self.namespace}:{incident_id}"),
+                        self.namespace,
+                        incident_id,
+                        evidence_ids,
+                        Jsonb(detail),
+                    ),
+                )
+
+        self._transaction(operation, idempotent=True)
 
     def stats(self) -> MemoryStats:
         def operation(connection: psycopg.Connection) -> MemoryStats:

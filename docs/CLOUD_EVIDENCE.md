@@ -27,7 +27,22 @@ default on current Basic clusters.
 
 ## Pending cloud evidence
 
-- Connect the official Managed MCP auditor with read-only scope.
+- Start a fresh trusted Codex session and preserve one live read-only MCP inspection
+  transcript. The server configuration and OAuth authorization are already complete,
+  but the client that performed setup cannot hot-load a new MCP server.
 - Run the pinned official transaction, SQL, and cloud-security Agent Skills.
 - Deploy the Lambda package after the AWS account owner completes console sign-in.
 - Add only the final AWS egress CIDR to the allowlist before cloud runtime verification.
+
+## 2026-07-16 — Managed MCP access boundary
+
+- Server: official CockroachDB Cloud Managed MCP endpoint
+- Authentication: OAuth completed with only the `mcp:read` scope
+- Project routing: the committed non-secret cluster ID targets `labrecall-memory`
+- Tool boundary: `.codex/config.toml` allowlists cluster/schema inspection, read-only
+  queries, query plans, and running-query inspection; mutation tools are excluded
+- Credential boundary: the OAuth token remains in the local Codex credential store and
+  no token or database credential is present in the repository
+- Verification boundary: authorization and configuration are proven; a live MCP tool
+  transcript remains pending because this already-running client cannot hot-load the
+  newly added server

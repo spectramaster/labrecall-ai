@@ -48,8 +48,24 @@ class RepairAgent:
             ]
             summary = "No confirmed repair memory was found; use a bounded diagnostic plan."
 
+        generation_mode = "deterministic"
+        generation_degraded = False
         if self.explainer:
-            summary = self.explainer.explain(incident, evidence, actions)
+            try:
+                summary = self.explainer.explain(incident, evidence, actions)
+                generation_mode = "bedrock"
+            except Exception:
+                generation_degraded = True
+
+        self.store.record_recommendation(
+            incident_id,
+            [item.memory_id for item in evidence],
+            {
+                "generation_mode": generation_mode,
+                "generation_degraded": generation_degraded,
+                "requires_human_approval": True,
+            },
+        )
 
         return Recommendation(
             incident_id=incident_id,
@@ -57,6 +73,8 @@ class RepairAgent:
             proposed_actions=actions,
             evidence=evidence,
             mode=self.mode,
+            generation_mode=generation_mode,
+            generation_degraded=generation_degraded,
         )
 
     def learn(self, incident_id: UUID, outcome: OutcomeInput) -> OutcomeReceipt:

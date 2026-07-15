@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Outcome-gated memory for research pipeline repairs">
+    <title>LabRecall AI</title>
+    <link rel="stylesheet" href="/static/app.css">
+    <script src="/static/app.js" defer></script>
+  </head>
+  <body>
+    <header class="hero">
+      <nav aria-label="Primary navigation">
+        <a class="brand" href="/">LabRecall <span>AI</span></a>
+        <div class="status" id="service-status" aria-live="polite">
+          <span class="status-dot"></span> Checking service
+        </div>
+      </nav>
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Outcome-gated agentic memory</p>
+          <h1>Stop solving the same research failure twice.</h1>
+          <p class="lede">LabRecall retrieves confirmed repairs from CockroachDB, asks
+            Bedrock to explain the evidence, and learns only after a human records what
+            actually happened.</p>
+        </div>
+        <ol class="flow" aria-label="How LabRecall works">
+          <li><span>01</span> Capture a bounded incident</li>
+          <li><span>02</span> Recall analogous outcomes</li>
+          <li><span>03</span> Approve and verify a repair</li>
+          <li><span>04</span> Promote evidence to memory</li>
+        </ol>
+      </div>
+    </header>
+
+    <main>
+      <section class="stats" aria-label="Memory statistics">
+        <div><strong id="stat-incidents">—</strong><span>incidents</span></div>
+        <div><strong id="stat-outcomes">—</strong><span>outcomes</span></div>
+        <div><strong id="stat-memories">—</strong><span>reusable memories</span></div>
+        <div><strong id="stat-audits">—</strong><span>audit events</span></div>
+      </section>
+
+      <div class="workspace">
+        <section class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="step-label">Step 1</p>
+              <h2>Describe the failure</h2>
+            </div>
+            <span class="privacy">Synthetic data only</span>
+          </div>
+          <form id="incident-form">
+            <label>Pipeline
+              <input id="pipeline" name="pipeline" value="spectral calibration" required
+                minlength="2" maxlength="120">
+            </label>
+            <label>Observed error
+              <textarea id="error" name="error" required minlength="3" maxlength="4000"
+                rows="4">Dark-reference drift after an instrument warm restart</textarea>
+            </label>
+            <label>Environment
+              <input id="environment" name="environment"
+                value="Synthetic TDLAS fixture, Python 3.12" required maxlength="1000">
+            </label>
+            <label>Constraints <span>(one per line)</span>
+              <textarea id="constraints" name="constraints" rows="3"
+                maxlength="1200">Read-only diagnosis first
+Preserve verified artifacts</textarea>
+            </label>
+            <button class="primary" type="submit" id="analyze-button">
+              Analyze with memory
+            </button>
+          </form>
+        </section>
+
+        <section class="panel result-panel" aria-live="polite">
+          <div class="panel-heading">
+            <div>
+              <p class="step-label">Step 2</p>
+              <h2>Evidence-bounded plan</h2>
+            </div>
+            <span class="approval">Human approval required</span>
+          </div>
+          <div id="empty-result" class="empty-state">
+            <div class="memory-mark" aria-hidden="true">M</div>
+            <p>Submit an incident to retrieve confirmed repair memories.</p>
+          </div>
+          <div id="recommendation" hidden>
+            <div class="recommendation-meta">
+              <span id="generation-mode"></span>
+              <code id="incident-id"></code>
+            </div>
+            <p id="summary" class="summary"></p>
+            <h3>Proposed validation sequence</h3>
+            <ol id="actions" class="actions"></ol>
+            <div id="evidence-block">
+              <h3>Retrieved evidence</h3>
+              <div id="evidence" class="evidence-list"></div>
+            </div>
+            <form id="outcome-form" class="outcome-form">
+              <h3>Record the observed outcome</h3>
+              <div class="status-options" role="radiogroup" aria-label="Outcome status">
+                <label><input type="radio" name="status" value="worked" checked> Worked</label>
+                <label><input type="radio" name="status" value="partial"> Partial</label>
+                <label><input type="radio" name="status" value="failed"> Failed</label>
+              </div>
+              <label>Action actually taken
+                <textarea id="action-taken" required minlength="3" maxlength="2000"
+                  rows="2"></textarea>
+              </label>
+              <label>Observation
+                <textarea id="observation" required minlength="3" maxlength="4000"
+                  rows="2">Synthetic acceptance check completed.</textarea>
+              </label>
+              <button class="secondary" type="submit" id="outcome-button">
+                Save human-confirmed outcome
+              </button>
+            </form>
+          </div>
+          <p id="message" class="message" role="status"></p>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      <p>CockroachDB transactional vector memory · AWS Bedrock explanations · No autonomous execution</p>
+    </footer>
+  </body>
+</html>
