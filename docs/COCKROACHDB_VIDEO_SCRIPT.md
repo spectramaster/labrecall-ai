@@ -1,7 +1,7 @@
 # CockroachDB submission video script — target 2:40
 
-> Record only after the public AWS service and live MCP inspection are verified. Use
-> synthetic incidents and hide account IDs, URLs containing tokens, and cloud credentials.
+> The public AWS service is verified. Record with synthetic incidents and hide account
+> IDs, URLs containing tokens, cloud credentials, and the AWS Support case page.
 
 ## 0:00–0:15 — hook
 
@@ -38,20 +38,22 @@ and generation path.
 
 ## 1:35–2:03 — real memory layer
 
-Show a safe CockroachDB view of the four tables and vector indexes, then a read-only MCP
-schema or aggregate inspection. Never show credentials or user data.
+Show the repository's verified schema/evidence page and the demo's governance timeline.
+Never show credentials or account data.
 
 > Incidents, outcomes, repair memories, and governance events are namespace-scoped. The
-> application user has only select, insert, and update grants. A separate Managed MCP
-> auditor is OAuth-scoped to read-only tools.
+> application user has only select, insert, and update grants, and the AWS instance is
+> the only address allowed to reach CockroachDB.
 
 ## 2:03–2:28 — AWS and failure behavior
 
-Show the architecture diagram and AWS Lambda health response with architecture.
+Show the architecture diagram, then `/health` with `mode=cloud`,
+`embedding_provider=hash`, and `architecture=x86_64`.
 
-> Lambda and API Gateway host the bounded service. Bedrock Titan embeds the incident and
-> Nova explains only supplied evidence. If generation fails, the service degrades
-> explicitly to deterministic language instead of inventing a repair.
+> Amazon Lightsail hosts the bounded service behind rate-limited HTTPS. Bedrock adapters
+> are implemented, but AWS is reviewing an account-level Runtime restriction, so this
+> public proof explicitly reports its isolated deterministic embedding provider. It
+> never pretends a blocked model call succeeded.
 
 ## 2:28–2:40 — close
 

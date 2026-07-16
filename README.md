@@ -10,8 +10,10 @@ LabRecall turns failed computational-research runs into durable, governed memory
 For each incident it stores structured state and an embedding in CockroachDB, retrieves
 semantically similar failures through CockroachDB's distributed vector index, proposes
 a bounded repair plan, and learns from the human-confirmed outcome. The public service
-is designed for a cost-bounded Amazon Lightsail deployment with a fixed database egress
-IP, an automatically renewed Let's Encrypt IP certificate, and Amazon Bedrock.
+is live on a cost-bounded Amazon Lightsail deployment with a fixed database egress IP
+and an automatically renewed Let's Encrypt IP certificate. Amazon Bedrock integration
+is implemented, but the current public demo explicitly uses an isolated deterministic
+embedding fallback while AWS Support reviews an account-wide Runtime restriction.
 
 This is a new project for the 2026 CockroachDB × AWS Build with Agentic Memory
 Hackathon. It was started during the official submission period. No ReproFrame source
@@ -37,18 +39,18 @@ of inflating the store. Confirmed failed reuse lowers that memory's calibrated
 confidence. Transaction retries use exponential backoff with jitter, while ambiguous
 commits are surfaced for operation-ID inspection instead of being blindly replayed.
 
-## Sponsor technology plan
+## Sponsor technology
 
 - **CockroachDB Distributed Vector Indexing:** runtime similarity search over failure
   signatures while keeping transactional state and embeddings consistent.
-- **CockroachDB Cloud Managed MCP Server:** a separately scoped auditor agent inspects
-  live schema, memory quality, and safe aggregate statistics with auditable access.
 - **CockroachDB Agent Skills:** the official schema and statement-analysis skills drive
-  reproducible database reviews; their outputs will be checked into an evidence ledger.
+  reproducible database reviews; the pinned source, findings, and fixes are committed in
+  the evidence ledger.
 - **Amazon Lightsail:** hosts the public FastAPI service behind a fixed egress IP and
   Nginx with an automatically renewed, short-lived Let's Encrypt IP certificate.
-- **Amazon Bedrock:** Titan creates embeddings and Nova generates evidence-bounded repair
-  explanations; fixture mode remains fully offline for tests.
+- **Amazon Bedrock (integration implemented, account review pending):** Titan and Nova
+  adapters are tested without claiming a successful live invocation. The public demo
+  reports `embedding_provider=hash` until AWS Support removes the Runtime restriction.
 - **AWS Lambda:** the same Mangum package is retained for Arm64 versus x86_64 sponsor
   measurement; it is not required for the primary public demo.
 

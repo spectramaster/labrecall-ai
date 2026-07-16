@@ -72,7 +72,6 @@ default on current Basic clusters.
 - Start a fresh trusted Codex session and preserve one live read-only MCP inspection
   transcript. The server configuration and OAuth authorization are already complete,
   but the client that performed setup cannot hot-load a new MCP server.
-- Run the pinned official transaction, SQL, and cloud-security Agent Skills.
 - Re-test Titan and Nova after AWS resolves support case `178416243800034`, switch
   `EMBEDDING_PROVIDER` from `hash` to `bedrock`, and preserve the frozen benchmark JSON.
 

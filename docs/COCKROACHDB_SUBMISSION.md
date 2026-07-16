@@ -1,8 +1,7 @@
 # CockroachDB × AWS Devpost submission
 
-> Status: judge-ready copy is prepared, but the functional AWS URL, public video URL,
-> and live MCP transcript must be inserted only after they are verified. Text in angle
-> brackets is a hard blocker and must never be submitted as-is.
+> Status: judge-ready copy and the functional AWS URL are verified. The public video URL
+> must be inserted only after the final under-three-minute recording is published.
 
 ## Project name
 
@@ -16,7 +15,7 @@ from human-confirmed outcomes.
 ## Links
 
 - Source: <https://github.com/spectramaster/labrecall-ai>
-- Functional demo: `<VERIFIED_AWS_DEMO_URL>`
+- Functional demo: <https://32.184.180.92>
 - Public video under three minutes: `<VERIFIED_YOUTUBE_URL>`
 
 ## Inspiration
@@ -59,12 +58,11 @@ The live Basic cluster uses namespace-scoped rows, least-privilege SQL, TLS, and
 The public AWS service runs FastAPI on Amazon Lightsail behind Nginx. The instance's
 fixed IPv4 is the only cloud address in CockroachDB's SQL allowlist, and a short-lived
 Let's Encrypt IP certificate supplies an automatically renewed HTTPS testing URL without
-adding a paid CDN. Amazon Bedrock
-Titan creates embeddings, while Nova produces evidence-bounded explanations. If Nova is
-unavailable, LabRecall falls back to deterministic language and returns
-`generation_degraded=true`; it does not silently invent an unverified repair. The
-database URL and time-bounded Bedrock exploration key stay in a root-owned server file
-and are removed after judging.
+adding a paid CDN. The live app currently uses an explicit deterministic embedding
+provider after AWS confirmed an account-wide Bedrock Runtime restriction. Provider names
+are part of CockroachDB namespaces, so fallback vectors cannot mix with future Titan
+vectors. The database URL and time-bounded Bedrock exploration key stay in a root-owned
+server file and are removed after judging.
 
 ## CockroachDB tools used
 
@@ -74,13 +72,6 @@ The agent stores normalized embeddings beside transactional memory and performs
 namespace-scoped cosine retrieval through distributed vector indexes. This is on the
 runtime path: remove vector recall and the agent loses its ability to reuse proven
 repairs.
-
-### Cloud Managed MCP Server
-
-A separate operations auditor connects to the official Managed MCP endpoint with OAuth
-scope `mcp:read`. The committed Codex configuration allowlists only cluster, schema,
-`SELECT`, plan, and running-query inspection tools; mutation tools are absent. The final
-submission will include the verified live transcript here: `<MCP_TRANSCRIPT_EVIDENCE>`.
 
 ### Agent Skills repository
 
@@ -93,11 +84,11 @@ resulting fixes are preserved in `docs/SKILL_EVIDENCE.md`.
 - **Amazon Lightsail:** fixed-egress application hosting on the first-use instance trial.
 - **Nginx + Let's Encrypt:** rate-limited HTTPS with an automatically renewed IP
   certificate.
-- **Amazon Bedrock Titan:** cloud embedding generation.
-- **Amazon Bedrock Nova Lite:** evidence-bounded explanation generation.
 - **Lightsail monitoring:** instance and public request/health evidence.
-- **AWS Lambda:** a separate Arm64/x86_64 package is used for reproducible architecture
-  measurement, not for the public database path.
+
+The repository also includes Bedrock Titan and Nova adapters. They are not claimed as a
+successful live service in this submission: AWS Support case `178416243800034` is
+reviewing the account-wide `ValidationException: Operation not allowed` response.
 
 ## Challenges we ran into
 
@@ -112,12 +103,16 @@ The most important product challenge was resisting generic “RAG with chat hist
 memory model had to preserve outcomes, confidence, idempotency, and governance evidence
 without allowing model text to become truth automatically.
 
+AWS Bedrock failed identically through Boto3, direct bearer HTTPS, two regions, and the
+account-owner Playground. Rather than conceal the failure or block the demo, we isolated
+a deterministic embedding provider in its own namespace, documented the evidence, and
+opened a support case. The public health endpoint exposes the active provider.
+
 ## Accomplishments
 
 - A real least-privilege CockroachDB client completed write → retrieve → confirmed
   outcome → memory promotion → learned recall.
-- Live recall returned the confirmed repair at cosine similarity `0.737865` with
-  calibrated confidence `0.666667`.
+- The public HTTPS proof recalled the confirmed repair at cosine similarity `0.823063`.
 - Four memory types share a single transactional and vector-capable database.
 - A one-click isolated proof visibly demonstrates cold abstention, human promotion,
   paraphrased recall, provenance IDs, confidence, and the ordered audit trail.
@@ -128,7 +123,7 @@ without allowing model text to become truth automatically.
 - The synthetic benchmark separates retrieval quality from generation and reports
   memory-on versus memory-off behavior without presenting fixture embeddings as model
   quality.
-- Fifteen automated tests and GitHub Actions currently pass from a clean public repository.
+- Twenty-one automated tests and Ruff currently pass from a clean public repository.
 
 ## What we learned
 
@@ -145,13 +140,12 @@ promotion, and automated retention controls for sensitive scientific environment
 
 ## Built with
 
-`cockroachdb`, `vector-search`, `managed-mcp`, `agent-skills`, `aws-lambda`,
-`amazon-bedrock`, `api-gateway`, `secrets-manager`, `fastapi`, `mangum`, `python`,
-`pytest`
+`cockroachdb`, `vector-search`, `agent-skills`, `aws-lightsail`, `nginx`,
+`amazon-bedrock`, `fastapi`, `python`, `pytest`
 
 ## Testing instructions
 
-1. Open `<VERIFIED_AWS_DEMO_URL>`; no account or credential should be required.
+1. Open <https://32.184.180.92>; no account or credential should be required.
 2. Select **Run the 20-second proof**.
 3. Verify the three completed stages: cold abstention, human-confirmed promotion, and
    paraphrased warm recall.

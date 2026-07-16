@@ -30,7 +30,8 @@ only from confirmed outcomes.
 - [x] Create a no-card CockroachDB Cloud cluster and least-privilege database user.
 - [x] Apply the vector-enabled schema and distributed vector index.
 - [x] Run a credentialed `labrecall_app` write → retrieve → outcome → learned-recall proof.
-- [ ] Preserve a live read-only MCP inspection transcript (OAuth and tool boundary are configured).
+- [ ] Optional: preserve a live read-only MCP inspection transcript after a fresh client loads
+  the configured server. This is not a claimed submission tool or a final-submission blocker.
 - [x] Run relevant official Agent Skills and record their findings and fixes.
 
 ### M3 — AWS application
@@ -50,6 +51,10 @@ only from confirmed outcomes.
   outcome-calibration checks.
 - [x] Compare memory-on versus memory-off retrieval, abstention, latency, consolidation,
   and negative-feedback behavior.
+- [x] Create the Devpost draft and fill the public story, verified links, required tool
+  selections, integration details, start date, reuse disclosure, and participant metadata.
+- [ ] Obtain the submitter's truthful confirmation of the government-entity employment
+  attestation before saving the remaining Additional info declarations.
 - [ ] Record a real under-three-minute demo showing the CockroachDB memory layer.
 - [ ] Publish the deployed app, demo video, and final evidence ledger (code and architecture published).
 - [ ] Submit early and verify the final public Devpost page.
@@ -58,7 +63,7 @@ only from confirmed outcomes.
 
 1. Memory design: the app fails its core task if CockroachDB memory is removed.
 2. Technical implementation: vector and transactional state share one consistent store;
-   MCP/skills evidence demonstrates safe operations.
+   the pinned Agent Skills review provides reproducible transaction, SQL, and security gates.
 3. Impact: the benchmark models repeated failures across researchers and sessions.
 4. Product readiness: bounded actions, human approval, tenant isolation, audit trails,
    least privilege, and tested recovery paths are visible.
