@@ -31,6 +31,8 @@ def render_environment(database_url: str, bedrock_token: str) -> str:
     values = {
         "LABRECALL_MODE": "cloud",
         "AWS_REGION": "us-east-1",
+        "AWS_EC2_METADATA_DISABLED": "true",
+        "EMBEDDING_PROVIDER": "bedrock",
         "MEMORY_NAMESPACE": "public-demo",
         "RETRIEVAL_MIN_SIMILARITY": "0.65",
         "DATABASE_URL": database_url,

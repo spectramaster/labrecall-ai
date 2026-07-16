@@ -110,12 +110,14 @@ def _database_url() -> str:
 
 def _session_namespace(session_id: str | None) -> str:
     settings = get_settings()
+    provider = settings.embedding_provider if settings.labrecall_mode == "cloud" else "hash"
+    base_namespace = f"{settings.memory_namespace}-{provider}"
     if not session_id:
-        return settings.memory_namespace
+        return base_namespace
     import hashlib
 
     suffix = hashlib.sha256(session_id.encode()).hexdigest()[:12]
-    return f"{settings.memory_namespace}-{suffix}"
+    return f"{base_namespace}-{suffix}"
 
 
 @lru_cache(maxsize=128)
@@ -123,18 +125,24 @@ def get_agent(session_id: str | None = None) -> RepairAgent:
     settings = get_settings()
     namespace = _session_namespace(session_id)
     if settings.labrecall_mode == "cloud":
-        bedrock = boto3.client("bedrock-runtime", region_name=settings.aws_region)
-        return RepairAgent(
-            store=CockroachMemoryStore(_database_url(), namespace),
-            embedder=BedrockTitanEmbedder(
+        if settings.embedding_provider == "bedrock":
+            bedrock = boto3.client("bedrock-runtime", region_name=settings.aws_region)
+            embedder = BedrockTitanEmbedder(
                 bedrock,
                 settings.bedrock_embed_model,
                 settings.embedding_dimensions,
-            ),
+            )
+            explainer = BedrockNovaExplainer(bedrock, settings.bedrock_text_model)
+        else:
+            embedder = HashEmbedder(settings.embedding_dimensions)
+            explainer = None
+        return RepairAgent(
+            store=CockroachMemoryStore(_database_url(), namespace),
+            embedder=embedder,
             mode=settings.labrecall_mode,
             retrieval_limit=settings.retrieval_limit,
             retrieval_min_similarity=settings.retrieval_min_similarity,
-            explainer=BedrockNovaExplainer(bedrock, settings.bedrock_text_model),
+            explainer=explainer,
         )
     return RepairAgent(
         store=LocalMemoryStore(),
@@ -147,9 +155,13 @@ def get_agent(session_id: str | None = None) -> RepairAgent:
 
 @app.get("/health")
 def health() -> dict[str, str]:
+    settings = get_settings()
     return {
         "status": "ok",
-        "mode": get_settings().labrecall_mode,
+        "mode": settings.labrecall_mode,
+        "embedding_provider": (
+            settings.embedding_provider if settings.labrecall_mode == "cloud" else "hash"
+        ),
         "version": "0.2.0",
         "architecture": platform.machine(),
     }

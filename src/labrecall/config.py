@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     aws_region: str = "us-east-1"
     bedrock_embed_model: str = "amazon.titan-embed-text-v2:0"
     bedrock_text_model: str = "amazon.nova-lite-v1:0"
+    embedding_provider: Literal["bedrock", "hash"] = "bedrock"
     memory_namespace: str = "public-demo"
     retrieval_limit: int = 5
     retrieval_min_similarity: float = 0.65

@@ -13,6 +13,7 @@ def test_health_and_memory_lifecycle() -> None:
     health = client.get("/health")
     assert health.json()["status"] == "ok"
     assert health.json()["architecture"]
+    assert health.json()["embedding_provider"] == "hash"
     assert health.headers["x-request-id"]
 
     home = client.get("/")

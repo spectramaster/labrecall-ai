@@ -35,10 +35,13 @@ only from confirmed outcomes.
 
 ### M3 — AWS application
 
-- [ ] Use Bedrock Titan embeddings and Nova for evidence-bounded explanations.
+- [ ] Use Bedrock Titan embeddings and Nova for evidence-bounded explanations (account
+  restriction reproduced in the owner Playground; AWS case `178416243800034` open).
 - [x] Prepare a hardened Lightsail systemd/Nginx deployment with fixed CockroachDB egress.
 - [x] Package the same FastAPI service for AWS Lambda/Arm measurement with Mangum.
-- [ ] Deploy a free-to-test public endpoint with protected server-side secrets.
+- [x] Deploy a free-to-test public HTTPS endpoint with protected server-side secrets.
+- [x] Add a visibly declared hash-embedding degraded mode with provider-isolated
+  CockroachDB namespaces so the public memory proof remains usable during AWS review.
 - [x] Add rate limits, input bounds, structured errors, logs, and health checks.
 
 ### M4 — evaluation and submission

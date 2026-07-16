@@ -22,6 +22,8 @@ def test_environment_has_only_expected_keys() -> None:
     assert rendered.splitlines() == [
         "LABRECALL_MODE=cloud",
         "AWS_REGION=us-east-1",
+        "AWS_EC2_METADATA_DISABLED=true",
+        "EMBEDDING_PROVIDER=bedrock",
         "MEMORY_NAMESPACE=public-demo",
         "RETRIEVAL_MIN_SIMILARITY=0.65",
         "DATABASE_URL=postgresql://example",

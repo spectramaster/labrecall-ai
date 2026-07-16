@@ -38,6 +38,13 @@ project uses one only because Lightsail instances do not support service roles. 
 production deployment should use short-term credentials on a service that supports an
 IAM execution role.
 
+Lightsail currently exposes an internal IAM-role credential source even though it does
+not provide a customer-managed instance role. `AWS_EC2_METADATA_DISABLED=true` prevents
+that credential from taking precedence over `AWS_BEARER_TOKEN_BEDROCK`. Do not remove
+this setting. `EMBEDDING_PROVIDER=hash` is an honest temporary degraded mode for an
+account-level Bedrock restriction; `bedrock` is the normal value. Each provider receives
+a separate CockroachDB namespace so vectors from different embedding spaces never mix.
+
 If the exploratory Bedrock key is rotated, update only that value with
 `sudo .venv/bin/python scripts/update_lightsail_bedrock_token.py`. The helper uses a
 hidden prompt, preserves the database URL and every non-secret setting, and atomically
