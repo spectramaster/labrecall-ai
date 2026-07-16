@@ -53,9 +53,9 @@ only from confirmed outcomes.
   and negative-feedback behavior.
 - [x] Create the Devpost draft and fill the public story, verified links, required tool
   selections, integration details, start date, reuse disclosure, and participant metadata.
-- [ ] Obtain the submitter's truthful confirmation of the government-entity employment
+- [x] Obtain the submitter's truthful confirmation of the government-entity employment
   attestation before saving the remaining Additional info declarations.
-- [ ] Record a real under-three-minute demo showing the CockroachDB memory layer.
+- [x] Record a real under-three-minute demo showing the CockroachDB memory layer.
 - [ ] Publish the deployed app, demo video, and final evidence ledger (code and architecture published).
 - [ ] Submit early and verify the final public Devpost page.
 

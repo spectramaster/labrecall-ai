@@ -1,7 +1,7 @@
 # CockroachDB × AWS Devpost submission
 
-> Status: judge-ready copy and the functional AWS URL are verified. The public video URL
-> must be inserted only after the final under-three-minute recording is published.
+> Status: judge-ready copy, the functional AWS URL, and the public under-three-minute
+> video are verified.
 
 ## Project name
 
@@ -16,7 +16,7 @@ from human-confirmed outcomes.
 
 - Source: <https://github.com/spectramaster/labrecall-ai>
 - Functional demo: <https://32.184.180.92>
-- Public video under three minutes: `<VERIFIED_YOUTUBE_URL>`
+- Public video under three minutes: <https://youtu.be/llfCoDkt1DE>
 
 ## Inspiration
 

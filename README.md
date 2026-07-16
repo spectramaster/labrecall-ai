@@ -2,6 +2,10 @@
 
 **A research-pipeline repair agent that remembers what actually worked.**
 
+[Public demo](https://32.184.180.92) ·
+[2:20 judge video](https://youtu.be/llfCoDkt1DE) ·
+[Submission evidence](docs/COCKROACHDB_SUBMISSION.md)
+
 ![LabRecall AI project cover](docs/assets/labrecall-cover.png)
 
 ![LabRecall AI web interface](docs/assets/labrecall-ui.jpg)

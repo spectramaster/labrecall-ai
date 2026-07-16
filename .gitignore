@@ -9,3 +9,5 @@ dist/
 build/
 .aws-sam/
 samconfig.toml
+submission_assets/labrecall-ai-devpost-demo.mp4
+submission_assets/video-build/

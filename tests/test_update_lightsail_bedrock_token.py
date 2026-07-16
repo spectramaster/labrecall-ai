@@ -10,14 +10,14 @@ def test_replace_token_preserves_all_other_settings() -> None:
         "LABRECALL_MODE=cloud\n"
         "DATABASE_URL=postgresql://example\n"
         "AWS_BEARER_TOKEN_BEDROCK=old\n"
-        "MEMORY_NAMESPACE=public-demo\n"
+        "MEMORY_NAMESPACE=public-demo\n"  # pragma: allowlist secret
     )
 
     assert replace_token(original, "new-token") == (
         "LABRECALL_MODE=cloud\n"
         "DATABASE_URL=postgresql://example\n"
         "AWS_BEARER_TOKEN_BEDROCK=new-token\n"
-        "MEMORY_NAMESPACE=public-demo\n"
+        "MEMORY_NAMESPACE=public-demo\n"  # pragma: allowlist secret
     )
 
 

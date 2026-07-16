@@ -1,0 +1,62 @@
+1
+00:00:00,000 --> 00:00:13,168
+Research teams lose hours solving the same pipeline failure
+twice. LabRecall is an agent that remembers only the repairs
+people confirmed actually worked. The memory, not the chat
+transcript, is the product.
+
+2
+00:00:13,418 --> 00:00:28,335
+This public Amazon Lightsail deployment runs a fresh, session-
+isolated proof. It captures a synthetic failure, records an
+observed outcome, and then submits a paraphrased repeat so we
+can see whether memory changes the decision.
+
+3
+00:00:28,585 --> 00:00:42,311
+On the first incident, CockroachDB stores the bounded
+environment and observations. With no confirmed analogue,
+LabRecall abstains from claiming a remembered repair and
+proposes safe, read-only diagnostics.
+
+4
+00:00:42,561 --> 00:00:59,839
+A repair is not learned from model text. Only an observed,
+human-confirmed outcome can promote it into semantic memory,
+atomically with its provenance and governance events. The proof
+finishes with two incidents, one outcome, one reusable memory,
+and eight audit events.
+
+5
+00:01:00,089 --> 00:01:18,506
+On the semantically equivalent failure, CockroachDB's
+distributed vector index retrieves the proven repair. The
+recommendation cites the memory ID, similarity, calibrated
+outcome confidence, and decision score, so a reviewer can
+inspect exactly why experience affected the plan.
+
+6
+00:01:18,756 --> 00:01:35,663
+Incidents, outcomes, repair memories, and governance events
+share one transactional source of truth. Namespace isolation
+prevents public test sessions from contaminating each other,
+while least-privilege grants and an ordered audit trail make
+every promotion reviewable.
+
+7
+00:01:35,913 --> 00:02:00,332
+Amazon Lightsail hosts the bounded FastAPI service behind rate-
+limited HTTPS, and its fixed address is the only cloud egress
+allowed to reach CockroachDB. Bedrock adapters are implemented,
+but an account-level Runtime restriction is under AWS review.
+The public proof explicitly reports its isolated deterministic
+embedding provider instead of pretending a blocked model call
+succeeded.
+
+8
+00:02:00,582 --> 00:02:19,121
+The official CockroachDB Agent Skills repository is pinned as a
+reproducible database review gate. Twenty-one automated tests
+pass. LabRecall turns troubleshooting into governed
+organizational memory: evidence, outcomes, confidence, and a
+repair your next run can trust.

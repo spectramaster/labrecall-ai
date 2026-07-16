@@ -1,0 +1,90 @@
+{
+  "title": "LabRecall AI — Outcome-Gated Agentic Memory with CockroachDB + AWS",
+  "description": "LabRecall AI remembers which research-pipeline repairs actually worked and learns only from human-confirmed outcomes. Built for the CockroachDB × AWS Build with Agentic Memory Hackathon.\n\nLive demo: https://32.184.180.92\nSource: https://github.com/spectramaster/labrecall-ai\n\nThe demo uses synthetic data only. Amazon Lightsail hosts the public service; CockroachDB provides transactional vector memory and the audit trail. Bedrock adapters are implemented, while an account-level Runtime restriction is under AWS review; the public demo reports its isolated deterministic embedding provider.",
+  "visibility": "Public",
+  "duration_seconds": 139.371,
+  "resolution": "1920x1080",
+  "fps": 30,
+  "scenes": [
+    {
+      "scene": "01-hook",
+      "start_seconds": 0.0,
+      "duration_seconds": 13.418,
+      "source_image": "docs/assets/labrecall-cover.png",
+      "eyebrow": "COCKROACHDB × AWS · AGENTIC MEMORY",
+      "title": "Stop solving the same research failure twice.",
+      "caption": "LabRecall learns only from human-confirmed outcomes.",
+      "narration": "Research teams lose hours solving the same pipeline failure twice. LabRecall is an agent that remembers only the repairs people confirmed actually worked. The memory, not the chat transcript, is the product."
+    },
+    {
+      "scene": "02-live-demo",
+      "start_seconds": 13.418,
+      "duration_seconds": 15.166,
+      "source_image": "docs/assets/video/01-home.png",
+      "eyebrow": "PUBLIC HTTPS DEMO · SYNTHETIC DATA ONLY",
+      "title": "A fresh, isolated proof in one click",
+      "caption": "Cold incident  /  human confirmation  /  cited recall",
+      "narration": "This public Amazon Lightsail deployment runs a fresh, session-isolated proof. It captures a synthetic failure, records an observed outcome, and then submits a paraphrased repeat so we can see whether memory changes the decision."
+    },
+    {
+      "scene": "03-cold",
+      "start_seconds": 28.585,
+      "duration_seconds": 13.976,
+      "source_image": "docs/assets/video/02-proof-cold.png",
+      "eyebrow": "STEP 1 · EPISODIC MEMORY",
+      "title": "Cold start: the agent abstains",
+      "caption": "No confirmed analogue means bounded diagnostics, not invented certainty.",
+      "narration": "On the first incident, CockroachDB stores the bounded environment and observations. With no confirmed analogue, LabRecall abstains from claiming a remembered repair and proposes safe, read-only diagnostics."
+    },
+    {
+      "scene": "04-gated-learning",
+      "start_seconds": 42.561,
+      "duration_seconds": 17.529,
+      "source_image": "docs/assets/video/03-proof-recall.png",
+      "eyebrow": "STEP 2 · OUTCOME MEMORY",
+      "title": "Model text is never promoted as truth",
+      "caption": "Only an observed, human-confirmed success becomes reusable memory.",
+      "narration": "A repair is not learned from model text. Only an observed, human-confirmed outcome can promote it into semantic memory, atomically with its provenance and governance events. The proof finishes with two incidents, one outcome, one reusable memory, and eight audit events."
+    },
+    {
+      "scene": "05-recall",
+      "start_seconds": 60.089,
+      "duration_seconds": 18.666,
+      "source_image": "docs/assets/video/04-evidence.png",
+      "eyebrow": "STEP 3 · DISTRIBUTED VECTOR INDEXING",
+      "title": "Warm recall cites the proven repair",
+      "caption": "Similarity 0.784 · confidence 0.667 · decision score 0.523",
+      "narration": "On the semantically equivalent failure, CockroachDB's distributed vector index retrieves the proven repair. The recommendation cites the memory ID, similarity, calibrated outcome confidence, and decision score, so a reviewer can inspect exactly why experience affected the plan."
+    },
+    {
+      "scene": "06-governance",
+      "start_seconds": 78.756,
+      "duration_seconds": 17.157,
+      "source_image": "docs/assets/video/05-audit.png",
+      "eyebrow": "COCKROACHDB · ONE CONSISTENCY BOUNDARY",
+      "title": "Transactional state and vector memory stay together",
+      "caption": "Capture, retrieval, recommendation, outcome, and promotion are ordered events.",
+      "narration": "Incidents, outcomes, repair memories, and governance events share one transactional source of truth. Namespace isolation prevents public test sessions from contaminating each other, while least-privilege grants and an ordered audit trail make every promotion reviewable."
+    },
+    {
+      "scene": "07-architecture",
+      "start_seconds": 95.913,
+      "duration_seconds": 24.669,
+      "source_image": "docs/assets/labrecall-architecture.png",
+      "eyebrow": "VERIFIED DEPLOYMENT BOUNDARY",
+      "title": "Honest failure behavior is part of the design",
+      "caption": "Lightsail hosts the live service; CockroachDB stores memory and audit evidence.",
+      "narration": "Amazon Lightsail hosts the bounded FastAPI service behind rate-limited HTTPS, and its fixed address is the only cloud egress allowed to reach CockroachDB. Bedrock adapters are implemented, but an account-level Runtime restriction is under AWS review. The public proof explicitly reports its isolated deterministic embedding provider instead of pretending a blocked model call succeeded."
+    },
+    {
+      "scene": "08-close",
+      "start_seconds": 120.582,
+      "duration_seconds": 18.789,
+      "source_image": "docs/assets/labrecall-cover.png",
+      "eyebrow": "OPEN SOURCE · REPRODUCIBLE · TESTED",
+      "title": "Governed memory your next run can trust",
+      "caption": "github.com/spectramaster/labrecall-ai  ·  https://32.184.180.92",
+      "narration": "The official CockroachDB Agent Skills repository is pinned as a reproducible database review gate. Twenty-one automated tests pass. LabRecall turns troubleshooting into governed organizational memory: evidence, outcomes, confidence, and a repair your next run can trust."
+    }
+  ]
+}
