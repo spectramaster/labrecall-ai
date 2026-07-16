@@ -1,7 +1,8 @@
 # CockroachDB × AWS Devpost submission
 
-> Status: judge-ready copy, the functional AWS URL, and the public under-three-minute
-> video are verified.
+> Status: submitted and independently re-verified on Devpost on July 16, 2026. The
+> functional AWS URL, public under-three-minute video, gallery, story, required tool
+> selections, and judge-only fields are all present.
 
 ## Project name
 
@@ -17,6 +18,7 @@ from human-confirmed outcomes.
 - Source: <https://github.com/spectramaster/labrecall-ai>
 - Functional demo: <https://32.184.180.92>
 - Public video under three minutes: <https://youtu.be/llfCoDkt1DE>
+- Submitted Devpost project: <https://devpost.com/software/labrecall-ai>
 
 ## Inspiration
 

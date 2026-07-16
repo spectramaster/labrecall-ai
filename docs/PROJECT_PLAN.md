@@ -56,8 +56,9 @@ only from confirmed outcomes.
 - [x] Obtain the submitter's truthful confirmation of the government-entity employment
   attestation before saving the remaining Additional info declarations.
 - [x] Record a real under-three-minute demo showing the CockroachDB memory layer.
-- [ ] Publish the deployed app, demo video, and final evidence ledger (code and architecture published).
-- [ ] Submit early and verify the final public Devpost page.
+- [x] Publish the deployed app, demo video, and final evidence ledger.
+- [x] Submit early and verify the final public Devpost page with its submitted status,
+  embedded judge video, gallery, story, technology tags, and judge-only fields intact.
 
 ## Judge-facing proof
 
