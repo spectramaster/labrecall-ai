@@ -5,7 +5,9 @@ import statistics
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from urllib.request import Request, urlopen
+from urllib.parse import urlsplit
+
+import httpx
 
 
 @dataclass(frozen=True)
@@ -27,16 +29,29 @@ def percentile(values: list[float], quantile: float) -> float:
     return ordered[rank]
 
 
-def _json_request(url: str, payload: dict[str, object] | None, timeout: float) -> dict:
-    body = json.dumps(payload).encode() if payload is not None else None
-    request = Request(
+def _json_request(
+    url: str,
+    payload: dict[str, object] | None,
+    timeout: float,
+) -> dict[str, object]:
+    parsed = urlsplit(url)
+    if parsed.scheme not in {"http", "https"} or not parsed.hostname:
+        raise ValueError("benchmark endpoint must be an absolute HTTP(S) URL")
+    if parsed.username or parsed.password:
+        raise ValueError("benchmark endpoint must not include URL credentials")
+
+    response = httpx.request(
+        "POST" if payload is not None else "GET",
         url,
-        data=body,
-        headers={"content-type": "application/json"},
-        method="POST" if payload is not None else "GET",
+        json=payload,
+        timeout=timeout,
+        follow_redirects=False,
     )
-    with urlopen(request, timeout=timeout) as response:  # noqa: S310 -- operator URL
-        return json.loads(response.read())
+    response.raise_for_status()
+    result = response.json()
+    if not isinstance(result, dict):
+        raise ValueError("benchmark endpoint must return a JSON object")
+    return result
 
 
 def measure_endpoint(

@@ -1,5 +1,5 @@
 import math
-import random
+import secrets
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -220,14 +220,14 @@ class CockroachMemoryStore:
                 if attempt + 1 == self.max_retries:
                     raise
                 base = 0.05 * (2**attempt)
-                time.sleep(base + random.uniform(0, base))
+                time.sleep(base + (secrets.randbelow(1001) / 1000) * base)
             except psycopg.errors.StatementCompletionUnknown as error:
                 if not idempotent or attempt + 1 == self.max_retries:
                     raise AmbiguousCommitError(
                         "transaction commit outcome is unknown; inspect by operation ID"
                     ) from error
                 base = 0.05 * (2**attempt)
-                time.sleep(base + random.uniform(0, base))
+                time.sleep(base + (secrets.randbelow(1001) / 1000) * base)
         raise RuntimeError("transaction retry loop exhausted")
 
     def create_incident(
@@ -553,18 +553,31 @@ class CockroachMemoryStore:
     def stats(self) -> MemoryStats:
         def operation(connection: psycopg.Connection) -> MemoryStats:
             with connection.cursor() as cursor:
-                counts: dict[str, int] = {}
-                for table in ("incidents", "outcomes", "repair_memories", "audit_events"):
-                    namespace_clause = "namespace = %s"
-                    if table == "outcomes":
-                        namespace_clause = (
-                            "incident_id IN (SELECT id FROM incidents WHERE namespace = %s)"
-                        )
-                    cursor.execute(
-                        f"SELECT count(*) AS count FROM {table} WHERE {namespace_clause}",
-                        (self.namespace,),
-                    )
-                    counts[table] = int(cursor.fetchone()["count"])
+                cursor.execute(
+                    """
+                    SELECT
+                        (SELECT count(*) FROM incidents WHERE namespace = %s) AS incidents,
+                        (
+                            SELECT count(*)
+                            FROM outcomes
+                            WHERE incident_id IN (
+                                SELECT id FROM incidents WHERE namespace = %s
+                            )
+                        ) AS outcomes,
+                        (
+                            SELECT count(*)
+                            FROM repair_memories
+                            WHERE namespace = %s
+                        ) AS repair_memories,
+                        (
+                            SELECT count(*)
+                            FROM audit_events
+                            WHERE namespace = %s
+                        ) AS audit_events
+                    """,
+                    (self.namespace, self.namespace, self.namespace, self.namespace),
+                )
+                counts = cursor.fetchone()
                 return MemoryStats(
                     incidents=counts["incidents"],
                     outcomes=counts["outcomes"],

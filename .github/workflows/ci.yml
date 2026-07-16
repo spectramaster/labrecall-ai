@@ -17,6 +17,7 @@ jobs:
           python-version: "3.12"
       - run: uv sync --extra dev --locked
       - run: uv run ruff check src tests scripts
+      - run: uv run bandit -q -r src
       - run: uv run pytest -q
       - run: PYTHONPATH=src uv run python -m labrecall.benchmark >/dev/null
       - run: PYTHONPATH=src uv run python scripts/bedrock_benchmark.py --help >/dev/null

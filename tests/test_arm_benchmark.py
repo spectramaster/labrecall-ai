@@ -1,4 +1,6 @@
-from labrecall.arm_benchmark import EndpointResult, compare, percentile
+import pytest
+
+from labrecall.arm_benchmark import EndpointResult, _json_request, compare, percentile
 
 
 def test_percentile_uses_nearest_rank() -> None:
@@ -13,3 +15,17 @@ def test_comparison_does_not_overstate_client_latency_as_cost() -> None:
     report = compare(arm, x86)
     assert report["arm_mean_latency_change_percent"] == -20.0
     assert "not Lambda billed duration" in report["warning"]
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "file:///tmp/result.json",
+        "ftp://benchmark.example/result",
+        "https://user@benchmark.example/health",
+        "benchmark.example/health",
+    ],
+)
+def test_json_request_rejects_unsafe_endpoint_urls(url: str) -> None:
+    with pytest.raises(ValueError):
+        _json_request(url, None, 1.0)
