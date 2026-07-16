@@ -62,6 +62,10 @@ default on current Basic clusters.
   the real transactional/vector-memory demo testable without claiming a Bedrock run.
   Switching back to `bedrock` cannot mix the two vector spaces because provider names
   are part of the namespace.
+- Public degraded-mode proof: the first synthetic spectral-calibration incident returned
+  no evidence, its human-confirmed repair was promoted, and a related warm-reboot incident
+  recalled that repair at cosine similarity `0.823063`. The public API then reported two
+  incidents, one outcome, one reusable memory, eight audit events, and HTTP 200 readiness.
 
 ## Pending cloud evidence
 
