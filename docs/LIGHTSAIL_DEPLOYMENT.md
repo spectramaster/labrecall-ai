@@ -38,6 +38,11 @@ project uses one only because Lightsail instances do not support service roles. 
 production deployment should use short-term credentials on a service that supports an
 IAM execution role.
 
+If the exploratory Bedrock key is rotated, update only that value with
+`sudo .venv/bin/python scripts/update_lightsail_bedrock_token.py`. The helper uses a
+hidden prompt, preserves the database URL and every non-secret setting, and atomically
+reinstalls the root-owned file with mode `0640`. Restart `labrecall` after the update.
+
 The helper accepts the dedicated SQL user's password rather than a hand-built URL. It
 URL-encodes arbitrary password characters, pins `sslmode=verify-full` and the downloaded
 CockroachDB CA certificate, then atomically installs the environment file. Neither
