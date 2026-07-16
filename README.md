@@ -116,8 +116,10 @@ Judge-ready drafts and timed demo scripts are in
 [`docs/COCKROACHDB_SUBMISSION.md`](docs/COCKROACHDB_SUBMISSION.md),
 [`docs/COCKROACHDB_VIDEO_SCRIPT.md`](docs/COCKROACHDB_VIDEO_SCRIPT.md),
 [`docs/ARM_SUBMISSION.md`](docs/ARM_SUBMISSION.md), and
-[`docs/ARM_VIDEO_SCRIPT.md`](docs/ARM_VIDEO_SCRIPT.md). Hard placeholders remain until
-the corresponding live cloud evidence is verified.
+[`docs/ARM_VIDEO_SCRIPT.md`](docs/ARM_VIDEO_SCRIPT.md). The CockroachDB submission is
+complete and contains no unresolved placeholders. The Arm files are a separate,
+intentionally unsubmitted measurement draft; their placeholders prevent unverified
+performance claims from being submitted as evidence.
 
 ## Read-only Managed MCP auditor
 

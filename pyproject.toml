@@ -2,7 +2,9 @@
 name = "labrecall-ai"
 version = "0.2.0"
 description = "A memory-first incident repair agent for research pipelines"
+readme = "README.md"
 requires-python = ">=3.11,<3.14"
+license = { text = "MIT" }
 dependencies = [
   "boto3>=1.40,<2",
   "fastapi>=0.116,<1",
@@ -16,7 +18,7 @@ dependencies = [
 dev = [
   "detect-secrets>=1.5,<2",
   "httpx>=0.28,<1",
-  "pytest>=8.4,<9",
+  "pytest>=9.0.3,<10",
   "ruff>=0.12,<1",
 ]
 
