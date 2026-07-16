@@ -6,6 +6,8 @@
 
 ![LabRecall AI web interface](docs/assets/labrecall-ui.jpg)
 
+![LabRecall AI architecture](docs/assets/labrecall-architecture.png)
+
 LabRecall turns failed computational-research runs into durable, governed memory.
 For each incident it stores structured state and an embedding in CockroachDB, retrieves
 semantically similar failures through CockroachDB's distributed vector index, proposes
